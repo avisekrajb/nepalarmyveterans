@@ -23,7 +23,7 @@ export function Leadership() {
 
   if (loading) {
     return (
-      <section className="py-20 bg-white flex items-center justify-center">
+      <section className="py-20 bg-white flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold"></div>
       </section>
     );
@@ -33,12 +33,11 @@ export function Leadership() {
     <section className="py-20 bg-white">
       <Container>
         <div className="max-w-3xl mx-auto text-center mb-12">
-          <Eyebrow>Our Team</Eyebrow>
           <h1 className="font-display text-3xl md:text-4xl font-bold text-army mt-4">
-            Leadership Team
+            केन्द्रीय सञ्चालन समिति
           </h1>
           <p className="text-gray-600 mt-4 text-lg">
-            Meet the dedicated individuals leading our organization towards success.
+            नेपाल राष्ट्रिय भूतपूर्व सैनिक संघको नेतृत्व टोली
           </p>
         </div>
 
@@ -50,6 +49,9 @@ export function Leadership() {
                   src={leader.image || 'https://placehold.co/400x400/1F3D2B/FFFFFF?text=Leader'}
                   alt={leader.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    e.target.src = 'https://placehold.co/400x400/1F3D2B/FFFFFF?text=Leader';
+                  }}
                 />
               </div>
               <div className="p-5">

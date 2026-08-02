@@ -19,6 +19,8 @@ const app = express();
 const corsOptions = {
   origin: [
     'http://localhost:4000',
+    'https://nepali-sena-complete-website.onrender.com/',
+    'https://nepali-sena-complete-backend.onrender.com/',
     'http://127.0.0.1:4000',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
@@ -71,6 +73,8 @@ app.use('/api/settings', require('./routes/settings'));
 
 // SUPER ADMIN ROUTES - Add this line
 app.use('/api/superadmin', require('./routes/superAdmin'));
+// Add this with other routes
+app.use('/api/contact-messages', require('./routes/contactMessages'));
 
 // 404 handler
 app.use((req, res) => {

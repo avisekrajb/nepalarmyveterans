@@ -6,14 +6,36 @@ const interviewSchema = new mongoose.Schema({
     required: [true, 'Title is required'],
     trim: true,
   },
-  content: {
-    type: String,
-    required: [true, 'Content is required'],
-  },
   guest: {
     type: String,
     required: [true, 'Guest name is required'],
     trim: true,
+  },
+  team: {
+    type: String,
+    default: '',
+    trim: true,
+  },
+  content: {
+    type: String,
+    required: [true, 'Content is required'],
+  },
+  type: {
+    type: String,
+    enum: ['image', 'video'],
+    default: 'image',
+  },
+  image: {
+    type: String,
+    default: '',
+  },
+  videoUrl: {
+    type: String,
+    default: '',
+  },
+  publicId: {
+    type: String,
+    default: '',
   },
   date: {
     type: Date,

@@ -11,11 +11,16 @@ const {
   deleteSenior,
 } = require('../controllers/heroController');
 
+// Public routes
 router.get('/', getHero);
+
+// Protected routes
 router.put('/', protect, updateHero);
 router.post('/carousel', protect, upload.single('image'), uploadCarouselImage);
 router.delete('/carousel/:index', protect, deleteCarouselImage);
-router.post('/seniors', protect, addSenior);
+
+// Senior routes - Make sure upload middleware is used for file uploads
+router.post('/seniors', protect, upload.single('image'), addSenior);
 router.delete('/seniors/:index', protect, deleteSenior);
 
 module.exports = router;

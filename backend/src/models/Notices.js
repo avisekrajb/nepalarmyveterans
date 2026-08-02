@@ -18,6 +18,10 @@ const noticesSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  showInModal: {
+    type: Boolean,
+    default: false,
+  },
   date: {
     type: Date,
     default: Date.now,

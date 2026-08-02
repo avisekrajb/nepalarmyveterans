@@ -1,37 +1,103 @@
 const mongoose = require('mongoose');
 
 const centralCommitteeSchema = new mongoose.Schema({
-  name: {
+  // Main Committee
+  title: {
     type: String,
-    required: [true, 'Name is required'],
-    trim: true,
+    default: 'केन्द्रीय कार्यसमिति',
   },
-  role: {
+  members: [{
+    name: { type: String, required: true },
+    role: { type: String, required: true },
+    bio: { type: String, default: '' },
+    image: { type: String, default: '' },
+    publicId: { type: String, default: '' },
+    order: { type: Number, default: 0 },
+  }],
+  
+  // District Committee
+  districtTitle: {
     type: String,
-    required: [true, 'Role is required'],
-    trim: true,
+    default: 'जिल्ला कार्यसमिति',
   },
-  bio: {
+  districtMembers: [{
+    name: { type: String, required: true },
+    role: { type: String, required: true },
+    bio: { type: String, default: '' },
+    image: { type: String, default: '' },
+    publicId: { type: String, default: '' },
+    order: { type: Number, default: 0 },
+  }],
+  
+  // Regional Committee
+  regionalTitle: {
     type: String,
-    default: '',
-    trim: true,
+    default: 'क्षेत्रीय सभापति',
   },
-  image: {
+  regionalMembers: [{
+    name: { type: String, required: true },
+    role: { type: String, required: true },
+    bio: { type: String, default: '' },
+    image: { type: String, default: '' },
+    publicId: { type: String, default: '' },
+    order: { type: Number, default: 0 },
+  }],
+  
+  // Unit Committee
+  unitTitle: {
     type: String,
-    default: '',
+    default: 'इकाई सभापति',
   },
-  publicId: {
+  unitMembers: [{
+    name: { type: String, required: true },
+    role: { type: String, required: true },
+    bio: { type: String, default: '' },
+    image: { type: String, default: '' },
+    publicId: { type: String, default: '' },
+    order: { type: Number, default: 0 },
+  }],
+  
+  // Provincial Coordinators
+  provincialTitle: {
     type: String,
-    default: '',
+    default: 'प्रदेश संयोजक',
   },
-  order: {
-    type: Number,
-    default: 0,
+  provincialMembers: [{
+    name: { type: String, required: true },
+    role: { type: String, required: true },
+    bio: { type: String, default: '' },
+    image: { type: String, default: '' },
+    publicId: { type: String, default: '' },
+    order: { type: Number, default: 0 },
+  }],
+  
+  // Central Members
+  centralMembersTitle: {
+    type: String,
+    default: 'केन्द्रीय सदस्य',
   },
-}, { 
-  timestamps: true,
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true },
-});
+  centralMembers: [{
+    name: { type: String, required: true },
+    role: { type: String, required: true },
+    bio: { type: String, default: '' },
+    image: { type: String, default: '' },
+    publicId: { type: String, default: '' },
+    order: { type: Number, default: 0 },
+  }],
+  
+  // Advisory Council
+  advisoryTitle: {
+    type: String,
+    default: 'सलाहकार मण्डल',
+  },
+  advisoryMembers: [{
+    name: { type: String, required: true },
+    role: { type: String, required: true },
+    bio: { type: String, default: '' },
+    image: { type: String, default: '' },
+    publicId: { type: String, default: '' },
+    order: { type: Number, default: 0 },
+  }],
+}, { timestamps: true });
 
 module.exports = mongoose.model('CentralCommittee', centralCommitteeSchema);

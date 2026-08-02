@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { noticesAPI } from '../../services/api';
-import { Plus, Trash2, Edit2, Upload, Image, X, Eye } from 'lucide-react';
+import { Plus, Trash2, Edit2, Upload, Image, X, Eye, CheckSquare, Square } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const NoticesManager = () => {
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
-  const [formData, setFormData] = useState({ title: '', content: '', date: '' });
+  const [formData, setFormData] = useState({ title: '', content: '', date: '', showInModal: false });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -50,6 +50,7 @@ const NoticesManager = () => {
     formDataObj.append('title', formData.title);
     formDataObj.append('content', formData.content);
     if (formData.date) formDataObj.append('date', formData.date);
+    formDataObj.append('showInModal', formData.showInModal);
     if (imageFile) {
       formDataObj.append('image', imageFile);
     }
@@ -90,6 +91,7 @@ const NoticesManager = () => {
       title: item.title,
       content: item.content,
       date: item.date ? new Date(item.date).toISOString().split('T')[0] : '',
+      showInModal: item.showInModal || false,
     });
     if (item.image && item.image !== '') {
       setImagePreview(item.image);
@@ -100,16 +102,58 @@ const NoticesManager = () => {
   };
 
   const resetForm = () => {
-    setFormData({ title: '', content: '', date: '' });
+    setFormData({ title: '', content: '', date: '', showInModal: false });
     setImageFile(null);
     setImagePreview(null);
     setEditing(null);
     setShowForm(false);
   };
 
-  // Helper function to check if image exists
+  const toggleModalStatus = async (id, currentStatus) => {
+    try {
+      // If setting to true, unset others first
+      if (!currentStatus) {
+        // Find the notice
+        const notice = notices.find(n => n._id === id);
+        if (notice) {
+          const formDataObj = new FormData();
+          formDataObj.append('title', notice.title);
+          formDataObj.append('content', notice.content);
+          formDataObj.append('showInModal', 'true');
+          if (notice.date) formDataObj.append('date', notice.date);
+          
+          // If there's an image, we need to keep it
+          // We'll update without changing the image
+          const { data } = await noticesAPI.updateNotice(id, formDataObj);
+          setNotices(notices.map(n => n._id === id ? data : n));
+          toast.success('Notice set as modal notice');
+        }
+      } else {
+        // Unset this notice from modal
+        const notice = notices.find(n => n._id === id);
+        if (notice) {
+          const formDataObj = new FormData();
+          formDataObj.append('title', notice.title);
+          formDataObj.append('content', notice.content);
+          formDataObj.append('showInModal', 'false');
+          if (notice.date) formDataObj.append('date', notice.date);
+          
+          const { data } = await noticesAPI.updateNotice(id, formDataObj);
+          setNotices(notices.map(n => n._id === id ? data : n));
+          toast.success('Notice removed from modal');
+        }
+      }
+    } catch (error) {
+      toast.error('Failed to update modal status');
+    }
+  };
+
   const hasImage = (item) => {
     return item.image && item.image !== '' && item.image !== null && item.image !== undefined;
+  };
+
+  const getModalNotice = () => {
+    return notices.find(n => n.showInModal === true);
   };
 
   if (loading) {
@@ -119,6 +163,8 @@ const NoticesManager = () => {
       </div>
     );
   }
+
+  const modalNotice = getModalNotice();
 
   return (
     <div className="space-y-6">
@@ -135,6 +181,27 @@ const NoticesManager = () => {
           Create Notice
         </button>
       </div>
+
+      {/* Modal Notice Indicator */}
+      {modalNotice && (
+        <div className="bg-gold/10 border border-gold/30 rounded-lg p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-gold p-2 rounded-lg">
+              <Eye className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-army">Modal Notice Active</p>
+              <p className="text-sm text-gray-600">"{modalNotice.title}" is currently showing in the modal</p>
+            </div>
+          </div>
+          <button
+            onClick={() => toggleModalStatus(modalNotice._id, true)}
+            className="text-red-500 hover:text-red-700 text-sm font-medium"
+          >
+            Remove from Modal
+          </button>
+        </div>
+      )}
 
       {showForm && (
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
@@ -169,7 +236,7 @@ const NoticesManager = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Image (Upload to Cloudinary)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Image (Optional)</label>
               <div className="flex items-center gap-4 flex-wrap">
                 <label className={`cursor-pointer bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                   <Upload className="h-4 w-4" />
@@ -201,12 +268,29 @@ const NoticesManager = () => {
                     </button>
                   </div>
                 )}
-                {!imagePreview && editing && (
-                  <span className="text-sm text-gray-400">No image uploaded</span>
-                )}
               </div>
               <p className="text-xs text-gray-500 mt-1">Supported formats: JPG, PNG, GIF, WebP (Max 5MB)</p>
             </div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, showInModal: !formData.showInModal })}
+                className="flex items-center gap-2 text-sm text-gray-700 hover:text-gold transition-colors"
+              >
+                {formData.showInModal ? (
+                  <CheckSquare className="h-5 w-5 text-gold" />
+                ) : (
+                  <Square className="h-5 w-5 text-gray-400" />
+                )}
+                Show this notice in modal popup
+              </button>
+            </div>
+            {formData.showInModal && (
+              <p className="text-xs text-gold-dark bg-gold/5 p-2 rounded-lg border border-gold/20">
+                <Eye className="h-3 w-3 inline mr-1" />
+                This notice will appear as a popup modal when users visit the website. Only one notice can be shown at a time.
+              </p>
+            )}
             <div className="flex gap-2">
               <button 
                 type="submit" 
@@ -242,6 +326,7 @@ const NoticesManager = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modal</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
@@ -274,6 +359,28 @@ const NoticesManager = () => {
                     </td>
                     <td className="px-6 py-4 text-gray-600 text-sm">
                       {new Date(item.date).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => toggleModalStatus(item._id, item.showInModal)}
+                        className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                          item.showInModal 
+                            ? 'bg-gold text-white hover:bg-gold-dark' 
+                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                        }`}
+                      >
+                        {item.showInModal ? (
+                          <>
+                            <Eye className="h-3 w-3" />
+                            Active
+                          </>
+                        ) : (
+                          <>
+                            <Square className="h-3 w-3" />
+                            Set as Modal
+                          </>
+                        )}
+                      </button>
                     </td>
                     <td className="px-6 py-4">
                       {hasImageValue ? (
@@ -322,7 +429,7 @@ const NoticesManager = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
           <p className="text-sm text-gray-500">Total Notices</p>
           <p className="text-2xl font-bold text-army">{notices.length}</p>
@@ -330,6 +437,12 @@ const NoticesManager = () => {
         <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
           <p className="text-sm text-gray-500">With Images</p>
           <p className="text-2xl font-bold text-army">{notices.filter(n => hasImage(n)).length}</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+          <p className="text-sm text-gray-500">Modal Notice</p>
+          <p className="text-lg font-bold text-gold truncate">
+            {modalNotice ? modalNotice.title : 'None set'}
+          </p>
         </div>
         <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
           <p className="text-sm text-gray-500">Latest Notice</p>

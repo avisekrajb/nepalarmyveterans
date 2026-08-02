@@ -13,6 +13,8 @@ import {
   Home,
   Mic,
   Shield,
+  MessageSquare,
+  DollarSign,
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -27,6 +29,7 @@ const Sidebar = () => {
     { path: '/admin/notices', icon: Bell, label: 'Notices' },
     { path: '/admin/interviews', icon: Mic, label: 'Interviews' },
     { path: '/admin/contact', icon: Mail, label: 'Contact' },
+    { path: '/admin/messages', icon: MessageSquare, label: 'Contact Messages' },
     { path: '/admin/introduction', icon: Info, label: 'Introduction' },
     { path: '/admin/logos', icon: Image, label: 'Logos' },
     { path: '/admin/settings', icon: Settings, label: 'Settings' },

@@ -8,6 +8,8 @@ import { ScrollProvider } from './context/ScrollContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 import MaintenanceModal from './components/MaintenanceModal';
+import RightClickProtection from './components/RightClickProtection';
+import NetworkStatus from './components/NetworkStatus';
 
 // Components
 import { Navbar } from './components/Navbar';
@@ -23,6 +25,7 @@ import NewsManager from './components/admin/NewsManager';
 import EventsManager from './components/admin/EventsManager';
 import NoticesManager from './components/admin/NoticesManager';
 import ContactManager from './components/admin/ContactManager';
+import ContactMessageManager from './components/admin/ContactMessageManager';
 import IntroductionManager from './components/admin/IntroductionManager';
 import LogoManager from './components/admin/LogoManager';
 import SettingsManager from './components/admin/SettingsManager';
@@ -41,24 +44,24 @@ import SuperSettings from './components/superadmin/SuperSettings';
 
 // Sections (Public)
 import AdminLogin from './sections/AdminLogin';
-import { Hero } from './sections/Hero';
-import { CentralCommittee } from './sections/CentralCommittee';
-import { Introduction } from './sections/Introduction';
-import { Mission } from './sections/Mission';
-import { Leadership } from './sections/Leadership';
-import { Council } from './sections/Council';
-import { HistoryFoundation } from './sections/HistoryFoundation';
-import { TaskProgram } from './sections/TaskProgram';
-import { News } from './sections/News';
-import { Articles } from './sections/Articles';
-import { Interviews } from './sections/Interviews';
-import { Notices } from './sections/Notices';
-import { Events } from './sections/Events';
-import { Gallery } from './sections/Gallery';
-import { FAQs } from './sections/FAQs';
+import Hero from './sections/Hero';
+import CentralCommittee from './sections/CentralCommittee';
+import Introduction from './sections/Introduction';
+import Mission from './sections/Mission';
+import Leadership from './sections/Leadership';
+import TreasuryTeams from './sections/TreasuryTeams';
+import HistoryFoundation from './sections/HistoryFoundation';
+import TaskProgram from './sections/TaskProgram';
+import News from './sections/News';
+import Articles from './sections/Articles';
+import Interviews from './sections/Interviews';
+import Notices from './sections/Notices';
+import Events from './sections/Events';
+import Gallery from './sections/Gallery';
+import FAQs from './sections/FAQs';
 import Training from './sections/Training';
-import { SecurityRules } from './sections/SecurityRules';
-import { Contact } from './sections/Contact';
+import SecurityRules from './sections/SecurityRules';
+import Contact from './sections/Contact';
 import NoticeModal from './components/NoticeModal';
 
 // Page wrapper with animation
@@ -113,7 +116,7 @@ function AnimatedRoutes() {
         <Route path="/introduction" element={<Layout><Page><Introduction /></Page></Layout>} />
         <Route path="/mission" element={<Layout><Page><Mission /></Page></Layout>} />
         <Route path="/leadership" element={<Layout><Page><Leadership /></Page></Layout>} />
-        <Route path="/council" element={<Layout><Page><Council /></Page></Layout>} />
+        <Route path="/treasuryteams" element={<Layout><Page><TreasuryTeams /></Page></Layout>} />
         <Route path="/history-foundation" element={<Layout><Page><HistoryFoundation /></Page></Layout>} />
         <Route path="/task-program" element={<Layout><Page><TaskProgram /></Page></Layout>} />
         <Route path="/news" element={<Layout><Page><News /></Page></Layout>} />
@@ -179,6 +182,11 @@ function AnimatedRoutes() {
             <AdminLayout><ContactManager /></AdminLayout>
           </ProtectedRoute>
         } />
+        <Route path="/admin/messages" element={
+          <ProtectedRoute>
+            <AdminLayout><ContactMessageManager /></AdminLayout>
+          </ProtectedRoute>
+        } />
         <Route path="/admin/introduction" element={
           <ProtectedRoute>
             <AdminLayout><IntroductionManager /></AdminLayout>
@@ -242,8 +250,10 @@ function App() {
         <ScrollProvider>
           <BrowserRouter>
             <AnimatedRoutes />
+            <RightClickProtection />
             <NoticeModal />
             <MaintenanceModal />
+            <NetworkStatus />
             <Toaster 
               position="top-right"
               toastOptions={{

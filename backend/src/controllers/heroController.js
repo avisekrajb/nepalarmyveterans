@@ -82,17 +82,55 @@ const deleteCarouselImage = async (req, res) => {
 
 const addSenior = async (req, res) => {
   try {
+    console.log('=== ADD SENIOR ===');
+    console.log('Request body:', req.body);
+    console.log('Request file:', req.file);
+
     let hero = await Hero.findOne();
     if (!hero) {
       hero = await Hero.create({ carouselImages: [], seniors: [] });
     }
 
-    const { name, role, image, publicId } = req.body;
-    hero.seniors.push({ name, role, image, publicId });
+    const { name, role } = req.body;
+    
+    // Validate required fields
+    if (!name || !role) {
+      return res.status(400).json({ message: 'Name and role are required' });
+    }
+
+    // Prepare senior data - handle both file upload and direct URL
+    let imageUrl = '';
+    let publicId = '';
+
+    if (req.file) {
+      // If file was uploaded via multer
+      imageUrl = req.file.path || req.file.secure_url || '';
+      publicId = req.file.filename || req.file.public_id || '';
+      console.log('Image uploaded via file:', { imageUrl, publicId });
+    } else if (req.body.image) {
+      // If image URL was provided directly
+      imageUrl = req.body.image;
+      publicId = req.body.publicId || '';
+      console.log('Image URL provided:', imageUrl);
+    }
+
+    const newSenior = {
+      name: name.trim(),
+      role: role.trim(),
+      image: imageUrl,
+      publicId: publicId,
+    };
+
+    console.log('New senior data:', newSenior);
+
+    hero.seniors.push(newSenior);
     await hero.save();
-    res.json(hero);
+    
+    console.log('Senior added successfully');
+    res.status(201).json(hero);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Add senior error:', error);
+    res.status(500).json({ message: error.message, stack: error.stack });
   }
 };
 

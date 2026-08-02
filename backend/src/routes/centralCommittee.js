@@ -4,29 +4,33 @@ const upload = require('../middleware/upload');
 const { protect } = require('../middleware/auth');
 const {
   getMembers,
-  createMember,
+  getMembersByCategory,
+  getExecutiveCommittee,
+  getDistrictCommittee,
+  getProvincialCoordinators,
+  getCentralMembers,
+  getAdvisoryCouncil,
+  updateCommittee,
+  addMember,
   updateMember,
   deleteMember,
+  updateSectionTitle,
 } = require('../controllers/centralCommitteeController');
 
-// @route   GET /api/central-committee
-// @desc    Get all committee members
-// @access  Public
+// Public routes
 router.get('/', getMembers);
+router.get('/category/:category', getMembersByCategory);
+router.get('/executive', getExecutiveCommittee);
+router.get('/district', getDistrictCommittee);
+router.get('/provincial', getProvincialCoordinators);
+router.get('/central-members', getCentralMembers);
+router.get('/advisory', getAdvisoryCouncil);
 
-// @route   POST /api/central-committee
-// @desc    Create a committee member
-// @access  Private (Admin only)
-router.post('/', protect, upload.single('image'), createMember);
-
-// @route   PUT /api/central-committee/:id
-// @desc    Update a committee member
-// @access  Private (Admin only)
-router.put('/:id', protect, upload.single('image'), updateMember);
-
-// @route   DELETE /api/central-committee/:id
-// @desc    Delete a committee member
-// @access  Private (Admin only)
-router.delete('/:id', protect, deleteMember);
+// Protected routes (Admin only) - ORDER MATTERS! Put specific routes before dynamic ones
+router.put('/', protect, updateCommittee);
+router.put('/title/:section', protect, updateSectionTitle);
+router.post('/:section', protect, upload.single('image'), addMember);
+router.put('/:section/:index', protect, upload.single('image'), updateMember);
+router.delete('/:section/:index', protect, deleteMember);
 
 module.exports = router;

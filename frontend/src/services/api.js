@@ -47,6 +47,7 @@ export const authAPI = {
 };
 
 // ==================== HERO API ====================
+// ==================== HERO API ====================
 export const heroAPI = {
   getHero: () => api.get('/hero'),
   updateHero: (data) => api.put('/hero', data),
@@ -56,7 +57,12 @@ export const heroAPI = {
     });
   },
   deleteCarouselImage: (index) => api.delete(`/hero/carousel/${index}`),
-  addSenior: (data) => api.post('/hero/seniors', data),
+  addSenior: (formData) => {
+    // Always send as FormData for file upload support
+    return api.post('/hero/seniors', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
   deleteSenior: (index) => api.delete(`/hero/seniors/${index}`),
 };
 
@@ -78,18 +84,55 @@ export const leadershipAPI = {
 
 // ==================== CENTRAL COMMITTEE API ====================
 export const centralCommitteeAPI = {
+  // Get all committee data
   getMembers: () => api.get('/central-committee'),
-  createMember: (formData) => {
-    return api.post('/central-committee', formData, {
+  
+  // Get specific categories
+  getMembersByCategory: (category) => api.get(`/central-committee/category/${category}`),
+  getExecutiveCommittee: () => api.get('/central-committee/executive'),
+  getDistrictCommittee: () => api.get('/central-committee/district'),
+  getProvincialCoordinators: () => api.get('/central-committee/provincial'),
+  getCentralMembers: () => api.get('/central-committee/central-members'),
+  getAdvisoryCouncil: () => api.get('/central-committee/advisory'),
+  
+  // Update entire committee
+  updateCommittee: (data) => api.put('/central-committee', data),
+  
+  // Add member to specific section
+  addMember: (section, formData) => {
+    console.log('API - Adding member to section:', section);
+    console.log('FormData entries:');
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+    return api.post(`/central-committee/${section}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
-  updateMember: (id, formData) => {
-    return api.put(`/central-committee/${id}`, formData, {
+  
+  // Update member in specific section
+  updateMember: (section, index, formData) => {
+    console.log('API - Updating member at section:', section, 'index:', index);
+    console.log('FormData entries:');
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+    return api.put(`/central-committee/${section}/${index}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
-  deleteMember: (id) => api.delete(`/central-committee/${id}`),
+  
+  // Delete member from specific section
+  deleteMember: (section, index) => {
+    console.log('API - Deleting member at section:', section, 'index:', index);
+    return api.delete(`/central-committee/${section}/${index}`);
+  },
+  
+  // Update section title
+  updateSectionTitle: (section, data) => {
+    console.log('API - Updating section title:', section, data);
+    return api.put(`/central-committee/title/${section}`, data);
+  },
 };
 
 // ==================== GALLERY API ====================
@@ -107,6 +150,15 @@ export const galleryAPI = {
 export const contactAPI = {
   getContact: () => api.get('/contact'),
   updateContact: (data) => api.put('/contact', data),
+};
+
+// ==================== CONTACT MESSAGES API ====================
+export const contactMessageAPI = {
+  getMessages: () => api.get('/contact-messages'),
+  getMessage: (id) => api.get(`/contact-messages/${id}`),
+  createMessage: (data) => api.post('/contact-messages', data),
+  updateMessageStatus: (id, data) => api.put(`/contact-messages/${id}/status`, data),
+  deleteMessage: (id) => api.delete(`/contact-messages/${id}`),
 };
 
 // ==================== INTRODUCTION API ====================
@@ -162,6 +214,7 @@ export const eventsAPI = {
 // ==================== NOTICES API ====================
 export const noticesAPI = {
   getNotices: () => api.get('/notices'),
+  getModalNotice: () => api.get('/notices/modal'),
   getNotice: (id) => api.get(`/notices/${id}`),
   createNotice: (formData) => {
     return api.post('/notices', formData, {
