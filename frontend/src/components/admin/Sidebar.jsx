@@ -25,6 +25,7 @@ const Sidebar = () => {
     { path: '/admin/central-committee', icon: Shield, label: 'Central Committee' },
     { path: '/admin/gallery', icon: Image, label: 'Gallery' },
     { path: '/admin/news', icon: FileText, label: 'News' },
+    { path: '/admin/articles', icon: FileText, label: 'Articles' },
     { path: '/admin/events', icon: Calendar, label: 'Events' },
     { path: '/admin/notices', icon: Bell, label: 'Notices' },
     { path: '/admin/interviews', icon: Mic, label: 'Interviews' },
@@ -36,7 +37,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <nav className="p-4 space-y-1 overflow-y-auto">
+    <nav className="p-4 space-y-1 pb-6">
       {menuItems.map((item) => (
         <NavLink
           key={item.path}

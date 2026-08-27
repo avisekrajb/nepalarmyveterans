@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { interviewAPI } from '../../services/api';
-import { Plus, Trash2, Edit2, Upload, Image, X, Video, User, Calendar, Globe } from 'lucide-react';
+import { 
+  Plus, Trash2, Edit2, Upload, Image, X, Video, User, Calendar, 
+  Globe, Link2, Eye, EyeOff, Users 
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const InterviewManager = () => {
@@ -9,17 +12,25 @@ const InterviewManager = () => {
   const [editing, setEditing] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
+    titleEn: '',
+    titleNe: '',
     guest: '',
+    guestEn: '',
+    guestNe: '',
     team: '',
     content: '',
+    contentEn: '',
+    contentNe: '',
     type: 'image',
     videoUrl: '',
     date: '',
+    enabled: true,
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [formLang, setFormLang] = useState('en');
 
   useEffect(() => {
     loadInterviews();
@@ -55,13 +66,18 @@ const InterviewManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataObj = new FormData();
-    formDataObj.append('title', formData.title);
+    formDataObj.append('title', formData.titleEn || '');
+    formDataObj.append('titleEn', formData.titleEn);
+    formDataObj.append('titleNe', formData.titleNe);
     formDataObj.append('guest', formData.guest);
-    formDataObj.append('team', formData.team);
-    formDataObj.append('content', formData.content);
+    formDataObj.append('team', formData.team || '');
+    formDataObj.append('content', formData.contentEn || '');
+    formDataObj.append('contentEn', formData.contentEn);
+    formDataObj.append('contentNe', formData.contentNe);
     formDataObj.append('type', formData.type);
     if (formData.videoUrl) formDataObj.append('videoUrl', formData.videoUrl);
     if (formData.date) formDataObj.append('date', formData.date);
+    formDataObj.append('enabled', formData.enabled);
     if (imageFile) {
       formDataObj.append('image', imageFile);
     }
@@ -96,16 +112,35 @@ const InterviewManager = () => {
     }
   };
 
+  const toggleEnabled = async (id, currentStatus) => {
+    try {
+      await interviewAPI.updateInterview(id, { enabled: !currentStatus });
+      setInterviews(interviews.map(i => 
+        i._id === id ? { ...i, enabled: !currentStatus } : i
+      ));
+      toast.success(`Interview ${!currentStatus ? 'shown' : 'hidden'} successfully`);
+    } catch (error) {
+      toast.error('Failed to update status');
+    }
+  };
+
   const editInterview = (item) => {
     setEditing(item._id);
     setFormData({
       title: item.title,
+      titleEn: item.titleEn || item.title || '',
+      titleNe: item.titleNe || '',
       guest: item.guest,
+      guestEn: item.guestEn || item.guest || '',
+      guestNe: item.guestNe || '',
       team: item.team || '',
       content: item.content,
+      contentEn: item.contentEn || item.content || '',
+      contentNe: item.contentNe || '',
       type: item.type || 'image',
       videoUrl: item.videoUrl || '',
       date: item.date ? new Date(item.date).toISOString().split('T')[0] : '',
+      enabled: item.enabled !== false,
     });
     if (item.image && item.image !== '') {
       setImagePreview(item.image);
@@ -118,22 +153,66 @@ const InterviewManager = () => {
   const resetForm = () => {
     setFormData({
       title: '',
+      titleEn: '',
+      titleNe: '',
       guest: '',
+      guestEn: '',
+      guestNe: '',
       team: '',
       content: '',
+      contentEn: '',
+      contentNe: '',
       type: 'image',
       videoUrl: '',
       date: '',
+      enabled: true,
     });
     setImageFile(null);
     setImagePreview(null);
     setEditing(null);
     setShowForm(false);
+    setFormLang('en');
   };
 
   const hasImage = (item) => {
     return item.image && item.image !== '' && item.image !== null && item.image !== undefined;
   };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    } catch {
+      return 'Invalid Date';
+    }
+  };
+
+  const LangTabs = () => (
+    <div className="flex bg-gray-100 rounded-lg p-0.5">
+      <button
+        type="button"
+        onClick={() => setFormLang('en')}
+        className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+          formLang === 'en' ? 'bg-white text-army shadow-sm' : 'text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        EN
+      </button>
+      <button
+        type="button"
+        onClick={() => setFormLang('ne')}
+        className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+          formLang === 'ne' ? 'bg-white text-army shadow-sm' : 'text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        NE
+      </button>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -155,7 +234,7 @@ const InterviewManager = () => {
           className="bg-gold text-white px-4 py-2 rounded-lg hover:bg-gold-dark transition-colors flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
-          Create Interview
+          {showForm ? 'Cancel' : 'Create Interview'}
         </button>
       </div>
 
@@ -164,14 +243,28 @@ const InterviewManager = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
-                  required
-                />
+                <div className="flex items-center gap-2 mb-1">
+                  <label className="block text-sm font-medium text-gray-700">Title *</label>
+                  <LangTabs />
+                </div>
+                {formLang === 'en' ? (
+                  <input
+                    type="text"
+                    value={formData.titleEn}
+                    onChange={(e) => setFormData({ ...formData, titleEn: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                    placeholder="Interview title in English"
+                    required
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={formData.titleNe}
+                    onChange={(e) => setFormData({ ...formData, titleNe: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                    placeholder="Interview title in Nepali"
+                  />
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Guest Name *</label>
@@ -181,6 +274,7 @@ const InterviewManager = () => {
                   onChange={(e) => setFormData({ ...formData, guest: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
                   required
+                  placeholder="Guest name"
                 />
               </div>
             </div>
@@ -195,14 +289,28 @@ const InterviewManager = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
-              <textarea
-                value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                rows="4"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
-                required
-              />
+              <div className="flex items-center gap-2 mb-1">
+                <label className="block text-sm font-medium text-gray-700">Content *</label>
+                <LangTabs />
+              </div>
+              {formLang === 'en' ? (
+                <textarea
+                  value={formData.contentEn}
+                  onChange={(e) => setFormData({ ...formData, contentEn: e.target.value })}
+                  rows="4"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                  placeholder="Interview content in English..."
+                  required
+                />
+              ) : (
+                <textarea
+                  value={formData.contentNe}
+                  onChange={(e) => setFormData({ ...formData, contentNe: e.target.value })}
+                  rows="4"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                  placeholder="Interview content in Nepali..."
+                />
+              )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -228,13 +336,25 @@ const InterviewManager = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Video URL (YouTube/Vimeo)</label>
-              <input
-                type="url"
-                value={formData.videoUrl}
-                onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
-                placeholder="https://www.youtube.com/watch?v=..."
-              />
+              <div className="flex items-center gap-2">
+                <input
+                  type="url"
+                  value={formData.videoUrl}
+                  onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                  placeholder="https://www.youtube.com/watch?v=..."
+                />
+                {formData.videoUrl && (
+                  <a 
+                    href={formData.videoUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-gold hover:text-gold-dark text-sm"
+                  >
+                    <Link2 className="h-5 w-5" />
+                  </a>
+                )}
+              </div>
               <p className="text-xs text-gray-500 mt-1">Paste YouTube or Vimeo video URL</p>
             </div>
             <div>
@@ -273,6 +393,17 @@ const InterviewManager = () => {
               </div>
               <p className="text-xs text-gray-500 mt-1">Upload guest photo (Max 10MB)</p>
             </div>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={formData.enabled}
+                  onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
+                  className="rounded border-gray-300 text-gold focus:ring-gold"
+                />
+                Show on website
+              </label>
+            </div>
             <div className="flex gap-2">
               <button 
                 type="submit" 
@@ -285,7 +416,7 @@ const InterviewManager = () => {
                     Uploading...
                   </>
                 ) : (
-                  editing ? 'Update' : 'Create'
+                  editing ? 'Update Interview' : 'Create Interview'
                 )}
               </button>
               <button
@@ -310,6 +441,7 @@ const InterviewManager = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
@@ -317,12 +449,12 @@ const InterviewManager = () => {
               {interviews.map((item) => {
                 const hasImageValue = hasImage(item);
                 return (
-                  <tr key={item._id}>
+                  <tr key={item._id} className={item.enabled === false ? 'opacity-50' : ''}>
                     <td className="px-6 py-4">
                       {hasImageValue ? (
                         <img 
                           src={item.image} 
-                          alt={item.title} 
+                          alt={item.titleEn || item.title} 
                           className="w-12 h-12 rounded-full object-cover border border-gray-200"
                           onError={(e) => {
                             e.target.onerror = null;
@@ -336,7 +468,8 @@ const InterviewManager = () => {
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-medium text-army">{item.title}</div>
+                      <div className="font-medium text-army">{item.titleEn || item.title}</div>
+                      {item.titleNe && <div className="text-xs text-gray-400">{item.titleNe}</div>}
                       <div className="text-sm text-gray-500">Guest: {item.guest}</div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">{item.team || 'N/A'}</td>
@@ -355,10 +488,35 @@ const InterviewManager = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      {new Date(item.date).toLocaleDateString()}
+                      {formatDate(item.date)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${
+                        item.enabled !== false 
+                          ? 'bg-green-100 text-green-600' 
+                          : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        {item.enabled !== false ? (
+                          <Eye className="h-3 w-3" />
+                        ) : (
+                          <EyeOff className="h-3 w-3" />
+                        )}
+                        {item.enabled !== false ? 'Visible' : 'Hidden'}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
+                        <button 
+                          onClick={() => toggleEnabled(item._id, item.enabled !== false)} 
+                          className={`p-1 rounded transition-colors ${
+                            item.enabled !== false 
+                              ? 'text-gray-400 hover:text-gray-600 hover:bg-gray-100' 
+                              : 'text-green-500 hover:text-green-700 hover:bg-green-50'
+                          }`}
+                          title={item.enabled !== false ? 'Hide' : 'Show'}
+                        >
+                          {item.enabled !== false ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
                         <button 
                           onClick={() => editInterview(item)} 
                           className="text-blue-600 hover:text-blue-800 transition-colors p-1 hover:bg-blue-50 rounded"
@@ -390,7 +548,6 @@ const InterviewManager = () => {
         )}
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
           <p className="text-sm text-gray-500">Total Interviews</p>
@@ -405,10 +562,8 @@ const InterviewManager = () => {
           <p className="text-2xl font-bold text-army">{interviews.filter(i => i.type === 'video').length}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-          <p className="text-sm text-gray-500">Latest Interview</p>
-          <p className="text-sm font-medium text-army truncate">
-            {interviews.length > 0 ? interviews[0].title : 'No interviews'}
-          </p>
+          <p className="text-sm text-gray-500">Visible</p>
+          <p className="text-2xl font-bold text-army">{interviews.filter(i => i.enabled !== false).length}</p>
         </div>
       </div>
     </div>

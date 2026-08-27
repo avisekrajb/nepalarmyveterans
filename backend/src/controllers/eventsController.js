@@ -12,12 +12,18 @@ const getEvents = async (req, res) => {
 
 const createEvent = async (req, res) => {
   try {
-    const { title, description, date, location } = req.body;
+    const { title, titleEn, titleNe, description, descriptionEn, descriptionNe, location, locationEn, locationNe, date } = req.body;
     const event = await Events.create({
-      title,
-      description,
+      title: title || titleEn || '',
+      titleEn: titleEn || title || '',
+      titleNe: titleNe || '',
+      description: description || descriptionEn || '',
+      descriptionEn: descriptionEn || description || '',
+      descriptionNe: descriptionNe || '',
+      location: location || locationEn || '',
+      locationEn: locationEn || location || '',
+      locationNe: locationNe || '',
       date,
-      location,
       image: req.file ? req.file.path : '',
       publicId: req.file ? req.file.filename : '',
     });
@@ -30,17 +36,23 @@ const createEvent = async (req, res) => {
 const updateEvent = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, date, location } = req.body;
+    const { title, titleEn, titleNe, description, descriptionEn, descriptionNe, location, locationEn, locationNe, date } = req.body;
     
     const event = await Events.findById(id);
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
     }
 
-    event.title = title || event.title;
-    event.description = description || event.description;
-    event.date = date || event.date;
-    event.location = location || event.location;
+    if (title !== undefined) event.title = title;
+    if (titleEn !== undefined) event.titleEn = titleEn;
+    if (titleNe !== undefined) event.titleNe = titleNe;
+    if (description !== undefined) event.description = description;
+    if (descriptionEn !== undefined) event.descriptionEn = descriptionEn;
+    if (descriptionNe !== undefined) event.descriptionNe = descriptionNe;
+    if (location !== undefined) event.location = location;
+    if (locationEn !== undefined) event.locationEn = locationEn;
+    if (locationNe !== undefined) event.locationNe = locationNe;
+    if (date !== undefined) event.date = date;
     
     if (req.file) {
       if (event.publicId) {

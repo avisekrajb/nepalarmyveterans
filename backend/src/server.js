@@ -115,9 +115,14 @@ app.use((err, req, res, next) => {
 
 const createDefaultAdmin = async () => {
   try {
-    const adminEmail = process.env.ADMIN_EMAIL || 'a@gmail.com';
-    const adminPassword = process.env.ADMIN_PASSWORD || '123456';
-    
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminEmail || !adminPassword) {
+      console.log('⚠️  ADMIN_EMAIL / ADMIN_PASSWORD not set in .env - default admin not created');
+      return;
+    }
+
     const adminExists = await Admin.findOne({ email: adminEmail });
     if (!adminExists) {
       await Admin.create({
@@ -138,9 +143,16 @@ const createDefaultAdmin = async () => {
 const createDefaultSuperAdmin = async () => {
   try {
     const SuperAdmin = require('./models/SuperAdmin');
-    const superEmail = 'super@gmail.com';
-    const superPassword = 'super123';
-    
+
+    // Credentials come strictly from .env - never hardcoded
+    const superEmail = process.env.SUPER_ADMIN_EMAIL;
+    const superPassword = process.env.SUPER_ADMIN_PASSWORD;
+
+    if (!superEmail || !superPassword) {
+      console.log('⚠️  SUPER_ADMIN_EMAIL / SUPER_ADMIN_PASSWORD not set in .env - default super admin not created');
+      return;
+    }
+
     const superExists = await SuperAdmin.findOne({ email: superEmail });
     if (!superExists) {
       await SuperAdmin.create({

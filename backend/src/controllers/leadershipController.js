@@ -12,11 +12,17 @@ const getLeadership = async (req, res) => {
 
 const createLeader = async (req, res) => {
   try {
-    const { name, role, bio } = req.body;
+    const { name, nameEn, nameNe, role, roleEn, roleNe, bio, bioEn, bioNe } = req.body;
     const leader = await Leadership.create({
-      name,
-      role,
-      bio,
+      name: name || nameEn || '',
+      nameEn: nameEn || name || '',
+      nameNe: nameNe || '',
+      role: role || roleEn || '',
+      roleEn: roleEn || role || '',
+      roleNe: roleNe || '',
+      bio: bio || bioEn || '',
+      bioEn: bioEn || bio || '',
+      bioNe: bioNe || '',
       image: req.file ? req.file.path : '',
       publicId: req.file ? req.file.filename : '',
     });
@@ -29,16 +35,20 @@ const createLeader = async (req, res) => {
 const updateLeader = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, role, bio } = req.body;
+    const { name, nameEn, nameNe, role, roleEn, roleNe, bio, bioEn, bioNe } = req.body;
     
     const leader = await Leadership.findById(id);
-    if (!leader) {
-      return res.status(404).json({ message: 'Leader not found' });
-    }
+    if (!leader) return res.status(404).json({ message: 'Leader not found' });
 
-    leader.name = name || leader.name;
-    leader.role = role || leader.role;
-    leader.bio = bio || leader.bio;
+    if (name !== undefined) leader.name = name;
+    if (nameEn !== undefined) leader.nameEn = nameEn;
+    if (nameNe !== undefined) leader.nameNe = nameNe;
+    if (role !== undefined) leader.role = role;
+    if (roleEn !== undefined) leader.roleEn = roleEn;
+    if (roleNe !== undefined) leader.roleNe = roleNe;
+    if (bio !== undefined) leader.bio = bio;
+    if (bioEn !== undefined) leader.bioEn = bioEn;
+    if (bioNe !== undefined) leader.bioNe = bioNe;
     
     if (req.file) {
       if (leader.publicId) {
@@ -59,9 +69,7 @@ const deleteLeader = async (req, res) => {
   try {
     const { id } = req.params;
     const leader = await Leadership.findById(id);
-    if (!leader) {
-      return res.status(404).json({ message: 'Leader not found' });
-    }
+    if (!leader) return res.status(404).json({ message: 'Leader not found' });
 
     if (leader.publicId) {
       await cloudinary.uploader.destroy(leader.publicId);
@@ -74,9 +82,4 @@ const deleteLeader = async (req, res) => {
   }
 };
 
-module.exports = {
-  getLeadership,
-  createLeader,
-  updateLeader,
-  deleteLeader,
-};
+module.exports = { getLeadership, createLeader, updateLeader, deleteLeader };

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import Loader from '../components/ui/Loader';
 import { Container } from '../components/ui/Section';
 import { galleryAPI } from '../services/api';
-import { Image, Video, X, Grid, LayoutGrid, Play, Calendar } from 'lucide-react';
+import { Image, Video, Grid, LayoutGrid, Play, Calendar } from 'lucide-react';
 
 export function Gallery() {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedItem, setSelectedItem] = useState(null);
   const [activeTab, setActiveTab] = useState('photos');
 
   useEffect(() => {
@@ -46,8 +48,8 @@ export function Gallery() {
 
   if (loading) {
     return (
-      <section className="py-20 bg-gray-50 flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold"></div>
+      <section className="py-20 bg-gray-50">
+        <Loader label={t('sections.loadingGallery')} />
       </section>
     );
   }
@@ -58,10 +60,10 @@ export function Gallery() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
             <h1 className="font-display text-3xl md:text-4xl font-bold text-army">
-              Gallery
+              {t('sections.galleryTitle')}
             </h1>
             <p className="text-gray-500 mt-2 text-sm">
-              Explore our collection of memorable moments and events
+              {t('sections.exploreCollection')}
             </p>
           </div>
 
@@ -77,7 +79,7 @@ export function Gallery() {
                 }`}
               >
                 <Image className="h-4 w-4" />
-                Photos ({photos.length})
+                {t('sections.photos')} ({photos.length})
               </button>
               <button
                 onClick={() => setActiveTab('videos')}
@@ -88,54 +90,51 @@ export function Gallery() {
                 }`}
               >
                 <Video className="h-4 w-4" />
-                Videos ({videos.length})
+                {t('sections.videos')} ({videos.length})
               </button>
             </div>
           </div>
 
-          {/* Gallery Grid */}
+          {/* Gallery Grid - Hover zoom only, no text */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {displayedItems.map((item) => (
               <div
                 key={item._id}
-                className="group relative aspect-square bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
-                onClick={() => setSelectedItem(item)}
+                className="relative aspect-square bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 group"
               >
                 {item.type === 'video' ? (
-                  <div className="w-full h-full bg-gray-900 relative">
+                  <div className="w-full h-full bg-gray-900 relative overflow-hidden">
                     <video 
                       src={item.url} 
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       muted
                     />
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/30 transition-all">
-                      <div className="w-14 h-14 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center pointer-events-none transition-opacity duration-300 group-hover:bg-black/30">
+                      <div className="w-14 h-14 bg-white/90 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
                         <Play className="h-6 w-6 text-army ml-1" />
                       </div>
                     </div>
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 pointer-events-none">
                       <p className="text-white text-xs font-medium truncate">{item.title || 'Untitled'}</p>
                     </div>
                   </div>
                 ) : (
-                  <>
+                  <div className="w-full h-full overflow-hidden">
                     <img
                       src={item.url}
                       alt={item.title || 'Gallery image'}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       onError={(e) => {
                         e.target.src = 'https://placehold.co/600x600/1F3D2B/FFFFFF?text=Image';
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                      <div className="p-3 w-full">
-                        <p className="text-white text-xs font-medium truncate">{item.title || 'Untitled'}</p>
-                      </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 pointer-events-none">
+                      <p className="text-white text-xs font-medium truncate w-full">{item.title || 'Untitled'}</p>
                     </div>
-                  </>
+                  </div>
                 )}
                 {item.type === 'video' && (
-                  <div className="absolute top-2 right-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <div className="absolute top-2 right-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1 pointer-events-none">
                     <Video className="h-3 w-3" />
                     Video
                   </div>
@@ -158,45 +157,6 @@ export function Gallery() {
           )}
         </div>
       </Container>
-
-      {/* Lightbox */}
-      {selectedItem && (
-        <div
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 animate-fadeIn"
-          onClick={() => setSelectedItem(null)}
-        >
-          <div className="relative max-w-5xl w-full max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
-            <button
-              className="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors text-2xl"
-              onClick={() => setSelectedItem(null)}
-            >
-              <X className="h-8 w-8" />
-            </button>
-            {selectedItem.type === 'video' ? (
-              <video
-                src={selectedItem.url}
-                controls
-                className="w-full h-auto max-h-[80vh] rounded-lg"
-                autoPlay
-              />
-            ) : (
-              <img
-                src={selectedItem.url}
-                alt={selectedItem.title}
-                className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
-                onError={(e) => {
-                  e.target.src = 'https://placehold.co/800x600/1F3D2B/FFFFFF?text=Image';
-                }}
-              />
-            )}
-            {selectedItem.title && (
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 rounded-b-lg">
-                <p className="text-white text-center font-medium">{selectedItem.title}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </section>
   );
 }

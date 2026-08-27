@@ -47,23 +47,28 @@ export const authAPI = {
 };
 
 // ==================== HERO API ====================
-// ==================== HERO API ====================
 export const heroAPI = {
   getHero: () => api.get('/hero'),
   updateHero: (data) => api.put('/hero', data),
+  saveContent: (content) => api.put('/hero', { content }),
   uploadCarouselImage: (formData) => {
     return api.post('/hero/carousel', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
   deleteCarouselImage: (index) => api.delete(`/hero/carousel/${index}`),
+  updateCarouselImage: (index, data) => api.put(`/hero/carousel/${index}`, data),
   addSenior: (formData) => {
-    // Always send as FormData for file upload support
     return api.post('/hero/seniors', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
   deleteSenior: (index) => api.delete(`/hero/seniors/${index}`),
+  updateSenior: (index, formData) => {
+    return api.put(`/hero/seniors/${index}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
 };
 
 // ==================== LEADERSHIP API ====================
@@ -84,55 +89,24 @@ export const leadershipAPI = {
 
 // ==================== CENTRAL COMMITTEE API ====================
 export const centralCommitteeAPI = {
-  // Get all committee data
-  getMembers: () => api.get('/central-committee'),
-  
-  // Get specific categories
-  getMembersByCategory: (category) => api.get(`/central-committee/category/${category}`),
-  getExecutiveCommittee: () => api.get('/central-committee/executive'),
-  getDistrictCommittee: () => api.get('/central-committee/district'),
-  getProvincialCoordinators: () => api.get('/central-committee/provincial'),
-  getCentralMembers: () => api.get('/central-committee/central-members'),
-  getAdvisoryCouncil: () => api.get('/central-committee/advisory'),
-  
-  // Update entire committee
-  updateCommittee: (data) => api.put('/central-committee', data),
-  
-  // Add member to specific section
-  addMember: (section, formData) => {
-    console.log('API - Adding member to section:', section);
-    console.log('FormData entries:');
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
-    return api.post(`/central-committee/${section}`, formData, {
+  getAll: () => api.get('/central-committee'),
+  getMembers: (params) => api.get('/central-committee/search', { params }),
+  getProvinces: () => api.get('/central-committee/provinces'),
+  getDistricts: (provinceNumber) => api.get(`/central-committee/districts/${provinceNumber}`),
+  addMember: (formData) => {
+    return api.post('/central-committee', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
-  
-  // Update member in specific section
-  updateMember: (section, index, formData) => {
-    console.log('API - Updating member at section:', section, 'index:', index);
-    console.log('FormData entries:');
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
-    return api.put(`/central-committee/${section}/${index}`, formData, {
+  updateMember: (id, formData) => {
+    return api.put(`/central-committee/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
-  
-  // Delete member from specific section
-  deleteMember: (section, index) => {
-    console.log('API - Deleting member at section:', section, 'index:', index);
-    return api.delete(`/central-committee/${section}/${index}`);
-  },
-  
-  // Update section title
-  updateSectionTitle: (section, data) => {
-    console.log('API - Updating section title:', section, data);
-    return api.put(`/central-committee/title/${section}`, data);
-  },
+  deleteMember: (id) => api.delete(`/central-committee/${id}`),
+  extendTerm: (id) => api.put(`/central-committee/${id}/extend`),
+  toggleActive: (id, active) => api.put(`/central-committee/${id}`, { active }),
+  updateOrder: (members) => api.put('/central-committee/order/bulk', { members }),
 };
 
 // ==================== GALLERY API ====================
@@ -140,6 +114,11 @@ export const galleryAPI = {
   getGallery: () => api.get('/gallery'),
   uploadItem: (formData) => {
     return api.post('/gallery', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+  updateItem: (id, formData) => {
+    return api.put(`/gallery/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
@@ -232,8 +211,17 @@ export const noticesAPI = {
 // ==================== INTERVIEWS API ====================
 export const interviewAPI = {
   getInterviews: () => api.get('/interviews'),
-  createInterview: (data) => api.post('/interviews', data),
-  updateInterview: (id, data) => api.put(`/interviews/${id}`, data),
+  getInterview: (id) => api.get(`/interviews/${id}`),
+  createInterview: (data) => {
+    return api.post('/interviews', data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+  updateInterview: (id, data) => {
+    return api.put(`/interviews/${id}`, data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
   deleteInterview: (id) => api.delete(`/interviews/${id}`),
 };
 
@@ -248,6 +236,164 @@ export const settingsAPI = {
 // ==================== HEALTH CHECK ====================
 export const healthAPI = {
   check: () => api.get('/health'),
+};
+
+// ==================== TEAM API ====================
+export const teamAPI = {
+  getTeam: () => api.get('/team'),
+  getTeamMember: (id) => api.get(`/team/${id}`),
+  createTeam: (formData) => {
+    return api.post('/team', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+  updateTeam: (id, formData) => {
+    return api.put(`/team/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+  deleteTeam: (id) => api.delete(`/team/${id}`),
+  followTeamMember: (id) => api.post(`/team/${id}/follow`),
+  unfollowTeamMember: (id) => api.post(`/team/${id}/unfollow`),
+  getTeamFollowers: (id) => api.get(`/team/${id}/followers`),
+  incrementTeamViews: (id) => api.post(`/team/${id}/view`),
+};
+
+// ==================== DONATION API ====================
+export const donationAPI = {
+  getDonations: () => api.get('/donations'),
+  createDonation: (data) => api.post('/donations', data),
+  updateDonationStatus: (id, status) => api.put(`/donations/${id}/status`, { status }),
+  deleteDonation: (id) => api.delete(`/donations/${id}`),
+};
+
+// ==================== BOOKING API ====================
+export const bookingAPI = {
+  getBookings: () => api.get('/bookings'),
+  createBooking: (data) => api.post('/bookings', data),
+  updateBookingStatus: (id, status) => api.put(`/bookings/${id}/status`, { status }),
+  deleteBooking: (id) => api.delete(`/bookings/${id}`),
+};
+
+// ==================== VISITOR API ====================
+export const visitorAPI = {
+  trackVisitor: (data) => api.post('/visitors/track', data),
+  getVisitorStats: () => api.get('/visitors/stats'),
+};
+
+// ==================== SUBSCRIBE API ====================
+export const subscribeAPI = {
+  subscribe: (email) => api.post('/subscribe', { email }),
+  unsubscribe: (email) => api.delete('/subscribe', { data: { email } }),
+  getSubscribers: () => api.get('/subscribe'),
+  deleteSubscriber: (id) => api.delete(`/subscribe/${id}`),
+};
+
+// ==================== PAYMENT API ====================
+export const paymentAPI = {
+  createPaymentIntent: (data) => api.post('/payment/create-intent', data),
+  confirmPayment: (data) => api.post('/payment/confirm', data),
+  getPaymentStatus: (id) => api.get(`/payment/status/${id}`),
+};
+
+// ==================== ABOUT API ====================
+export const aboutAPI = {
+  getAbout: () => api.get('/about'),
+  updateAbout: (data) => api.put('/about', data),
+};
+
+// ==================== HISTORY API ====================
+export const historyAPI = {
+  getHistory: () => api.get('/history'),
+  createHistory: (data) => api.post('/history', data),
+  updateHistory: (id, data) => api.put(`/history/${id}`, data),
+  deleteHistory: (id) => api.delete(`/history/${id}`),
+};
+
+// ==================== ADMIN API ====================
+export const adminAPI = {
+  // Dashboard Stats
+  getDashboardStats: () => api.get('/admin/dashboard/stats'),
+  getRecentActivity: () => api.get('/admin/dashboard/activity'),
+  
+  // Users
+  getUsers: () => api.get('/admin/users'),
+  updateUserRole: (id, role) => api.put(`/admin/users/${id}/role`, { role }),
+  deleteUser: (id) => api.delete(`/admin/users/${id}`),
+  
+  // Bookings
+  getBookings: () => api.get('/admin/bookings'),
+  updateBookingStatus: (id, status) => api.put(`/admin/bookings/${id}/status`, { status }),
+  
+  // Donations
+  getDonations: () => api.get('/admin/donations'),
+  updateDonationStatus: (id, status) => api.put(`/admin/donations/${id}/status`, { status }),
+  deleteDonation: (id) => api.delete(`/admin/donations/${id}`),
+  
+  // Settings
+  getSettings: () => api.get('/admin/settings'),
+  updateSettings: (data) => api.put('/admin/settings', data),
+  
+  // Uploads
+  uploadHero: (formData) => api.post('/admin/upload/hero', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  uploadLogo: (formData) => api.post('/admin/upload/logo', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  uploadAbout: (formData) => api.post('/admin/upload/about', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  uploadQR: (formData) => api.post('/admin/upload/qr', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  uploadTeam: (formData) => api.post('/admin/upload/team', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  uploadHistory: (formData) => api.post('/admin/upload/history', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  uploadHistoryBanner: (formData) => api.post('/admin/upload/history-banner', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  uploadEvent: (formData) => api.post('/admin/upload/event', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  uploadGallery: (formData) => api.post('/admin/upload/gallery', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  uploadFooterImage: (formData) => api.post('/admin/upload/footer', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  uploadFooterVideo: (formData) => api.post('/admin/upload/footer/video', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  uploadBookingBg: (formData) => api.post('/admin/upload/booking-bg', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  
+  // Activity Logs
+  getActivityLogs: () => api.get('/admin/activity'),
+  clearActivityLogs: () => api.delete('/admin/activity'),
+  getActivityStats: () => api.get('/admin/activity/stats'),
+};
+
+// ==================== CLOUDINARY API ====================
+export const cloudinaryAPI = {
+  getResources: () => api.get('/admin/cloud/resources'),
+  getResource: (publicId) => api.get(`/admin/cloud/resource/${publicId}`),
+  deleteResource: (publicId) => api.delete(`/admin/cloud/resource/${publicId}`),
+  deleteMultipleResources: (ids) => api.post('/admin/cloud/resources/delete', { ids }),
+  getStats: () => api.get('/admin/cloud/stats'),
+  searchResources: (query) => api.get('/admin/cloud/search', { params: { query } }),
+};
+
+// ==================== BACKUP API ====================
+export const backupAPI = {
+  createBackup: () => api.post('/admin/backup'),
+  getBackups: () => api.get('/admin/backup'),
+  restoreBackup: (id) => api.post(`/admin/backup/restore/${id}`),
+  deleteBackup: (id) => api.delete(`/admin/backup/${id}`),
 };
 
 // ==================== SUPER ADMIN API ====================

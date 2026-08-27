@@ -4,7 +4,7 @@ import { Mail, Phone, MapPin, Save, Eye, Edit2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const ContactManager = () => {
-  const [contact, setContact] = useState({ address: '', phone: '', email: '', mapEmbed: '' });
+  const [contact, setContact] = useState({ addressEn: '', addressNe: '', phoneEn: '', phoneNe: '', emailEn: '', emailNe: '', mapEmbed: '' });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -18,9 +18,12 @@ const ContactManager = () => {
       // If data is returned, use it, otherwise use default
       if (data) {
         setContact({
-          address: data.address || '',
-          phone: data.phone || '',
-          email: data.email || '',
+          addressEn: data.addressEn || data.address || '',
+          addressNe: data.addressNe || '',
+          phoneEn: data.phoneEn || data.phone || '',
+          phoneNe: data.phoneNe || '',
+          emailEn: data.emailEn || data.email || '',
+          emailNe: data.emailNe || '',
           mapEmbed: data.mapEmbed || '',
         });
       }
@@ -36,7 +39,18 @@ const ContactManager = () => {
     e.preventDefault();
     setSaving(true);
     try {
-      const { data } = await contactAPI.updateContact(contact);
+      const { data } = await contactAPI.updateContact({
+        address: contact.addressEn || contact.addressNe || '',
+        addressEn: contact.addressEn,
+        addressNe: contact.addressNe,
+        phone: contact.phoneEn || contact.phoneNe || '',
+        phoneEn: contact.phoneEn,
+        phoneNe: contact.phoneNe,
+        email: contact.emailEn || contact.emailNe || '',
+        emailEn: contact.emailEn,
+        emailNe: contact.emailNe,
+        mapEmbed: contact.mapEmbed,
+      });
       setContact(data);
       toast.success('Contact information updated successfully');
     } catch (error) {
@@ -70,41 +84,83 @@ const ContactManager = () => {
       {/* Main Form */}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Address <span className="text-gray-400 text-xs">(Full Address)</span>
-            </label>
-            <input
-              type="text"
-              value={contact.address || ''}
-              onChange={(e) => setContact({ ...contact, address: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent transition-all"
-              placeholder="Enter full address"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Address (English) <span className="text-gray-400 text-xs">(Full Address)</span>
+              </label>
+              <input
+                type="text"
+                value={contact.addressEn || ''}
+                onChange={(e) => setContact({ ...contact, addressEn: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent transition-all"
+                placeholder="Enter full address in English"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Address (Nepali) <span className="text-gray-400 text-xs">(पूरा ठेगाना)</span>
+              </label>
+              <input
+                type="text"
+                value={contact.addressNe || ''}
+                onChange={(e) => setContact({ ...contact, addressNe: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent transition-all"
+                placeholder="नेपालीमा पूरा ठेगाना लेख्नुहोस्"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Phone Number <span className="text-gray-400 text-xs">(With Country Code)</span>
-            </label>
-            <input
-              type="text"
-              value={contact.phone || ''}
-              onChange={(e) => setContact({ ...contact, phone: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent transition-all"
-              placeholder="+977-1-1234567"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone Number (English) <span className="text-gray-400 text-xs">(With Country Code)</span>
+              </label>
+              <input
+                type="text"
+                value={contact.phoneEn || ''}
+                onChange={(e) => setContact({ ...contact, phoneEn: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent transition-all"
+                placeholder="+977-1-1234567"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone Number (Nepali) <span className="text-gray-400 text-xs">(फोन नम्बर)</span>
+              </label>
+              <input
+                type="text"
+                value={contact.phoneNe || ''}
+                onChange={(e) => setContact({ ...contact, phoneNe: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent transition-all"
+                placeholder="+९७७-१-१२३४५६७"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address <span className="text-gray-400 text-xs">(Official Email)</span>
-            </label>
-            <input
-              type="email"
-              value={contact.email || ''}
-              onChange={(e) => setContact({ ...contact, email: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent transition-all"
-              placeholder="info@nepalarmy.org"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email Address (English) <span className="text-gray-400 text-xs">(Official Email)</span>
+              </label>
+              <input
+                type="email"
+                value={contact.emailEn || ''}
+                onChange={(e) => setContact({ ...contact, emailEn: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent transition-all"
+                placeholder="info@nepalarmy.org"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email Address (Nepali) <span className="text-gray-400 text-xs">(इमेल ठेगाना)</span>
+              </label>
+              <input
+                type="email"
+                value={contact.emailNe || ''}
+                onChange={(e) => setContact({ ...contact, emailNe: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent transition-all"
+                placeholder="info@nepalarmy.org"
+              />
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -149,7 +205,8 @@ const ContactManager = () => {
             </div>
             <span className="font-semibold">Address</span>
           </div>
-          <p className="text-gray-600 text-sm">{contact.address || 'Not set'}</p>
+          <p className="text-gray-600 text-sm">{contact.addressEn || 'Not set'}</p>
+          {contact.addressNe && <p className="text-gray-500 text-xs mt-1">{contact.addressNe}</p>}
         </div>
         <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100 hover:shadow-md transition-shadow">
           <div className="flex items-center gap-3 text-army mb-2">
@@ -158,7 +215,8 @@ const ContactManager = () => {
             </div>
             <span className="font-semibold">Phone</span>
           </div>
-          <p className="text-gray-600 text-sm">{contact.phone || 'Not set'}</p>
+          <p className="text-gray-600 text-sm">{contact.phoneEn || contact.phone || 'Not set'}</p>
+          {contact.phoneNe && <p className="text-gray-500 text-xs mt-1">{contact.phoneNe}</p>}
         </div>
         <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100 hover:shadow-md transition-shadow">
           <div className="flex items-center gap-3 text-army mb-2">
@@ -167,7 +225,8 @@ const ContactManager = () => {
             </div>
             <span className="font-semibold">Email</span>
           </div>
-          <p className="text-gray-600 text-sm">{contact.email || 'Not set'}</p>
+          <p className="text-gray-600 text-sm">{contact.emailEn || contact.email || 'Not set'}</p>
+          {contact.emailNe && <p className="text-gray-500 text-xs mt-1">{contact.emailNe}</p>}
         </div>
       </div>
 

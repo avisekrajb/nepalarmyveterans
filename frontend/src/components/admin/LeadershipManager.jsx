@@ -7,7 +7,7 @@ const LeadershipManager = () => {
   const [leaders, setLeaders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
-  const [formData, setFormData] = useState({ name: '', role: '', bio: '' });
+  const [formData, setFormData] = useState({ name: '', nameEn: '', nameNe: '', role: '', roleEn: '', roleNe: '', bio: '', bioEn: '', bioNe: '' });
   const [imageFile, setImageFile] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
@@ -29,9 +29,15 @@ const LeadershipManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataObj = new FormData();
-    formDataObj.append('name', formData.name);
-    formDataObj.append('role', formData.role);
-    formDataObj.append('bio', formData.bio);
+    formDataObj.append('name', formData.nameEn || formData.name);
+    formDataObj.append('nameEn', formData.nameEn);
+    formDataObj.append('nameNe', formData.nameNe);
+    formDataObj.append('role', formData.roleEn || formData.role);
+    formDataObj.append('roleEn', formData.roleEn);
+    formDataObj.append('roleNe', formData.roleNe);
+    formDataObj.append('bio', formData.bioEn || formData.bio);
+    formDataObj.append('bioEn', formData.bioEn);
+    formDataObj.append('bioNe', formData.bioNe);
     if (imageFile) {
       formDataObj.append('image', imageFile);
     }
@@ -65,12 +71,22 @@ const LeadershipManager = () => {
 
   const editLeader = (leader) => {
     setEditing(leader._id);
-    setFormData({ name: leader.name, role: leader.role, bio: leader.bio });
+    setFormData({
+      name: leader.name,
+      nameEn: leader.nameEn || leader.name || '',
+      nameNe: leader.nameNe || '',
+      role: leader.role,
+      roleEn: leader.roleEn || leader.role || '',
+      roleNe: leader.roleNe || '',
+      bio: leader.bio || '',
+      bioEn: leader.bioEn || leader.bio || '',
+      bioNe: leader.bioNe || '',
+    });
     setShowForm(true);
   };
 
   const resetForm = () => {
-    setFormData({ name: '', role: '', bio: '' });
+    setFormData({ name: '', nameEn: '', nameNe: '', role: '', roleEn: '', roleNe: '', bio: '', bioEn: '', bioNe: '' });
     setImageFile(null);
     setEditing(null);
     setShowForm(false);
@@ -102,34 +118,65 @@ const LeadershipManager = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name (English) *</label>
                 <input
                   type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  value={formData.nameEn}
+                  onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name (Nepali)</label>
                 <input
                   type="text"
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  value={formData.nameNe}
+                  onChange={(e) => setFormData({ ...formData, nameNe: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Role (English) *</label>
+                <input
+                  type="text"
+                  value={formData.roleEn}
+                  onChange={(e) => setFormData({ ...formData, roleEn: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
                   required
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Role (Nepali)</label>
+                <input
+                  type="text"
+                  value={formData.roleNe}
+                  onChange={(e) => setFormData({ ...formData, roleNe: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-              <textarea
-                value={formData.bio}
-                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                rows="3"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Bio (English)</label>
+                <textarea
+                  value={formData.bioEn}
+                  onChange={(e) => setFormData({ ...formData, bioEn: e.target.value })}
+                  rows="3"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Bio (Nepali)</label>
+                <textarea
+                  value={formData.bioNe}
+                  onChange={(e) => setFormData({ ...formData, bioNe: e.target.value })}
+                  rows="3"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                />
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Photo</label>
@@ -172,8 +219,8 @@ const LeadershipManager = () => {
                 <td className="px-6 py-4">
                   <img src={leader.image || 'https://placehold.co/50x50/1F3D2B/FFFFFF?text=Photo'} alt={leader.name} className="w-10 h-10 rounded-full object-cover" />
                 </td>
-                <td className="px-6 py-4 font-medium text-army">{leader.name}</td>
-                <td className="px-6 py-4 text-gray-600">{leader.role}</td>
+                <td className="px-6 py-4 font-medium text-army">{leader.nameEn || leader.name}</td>
+                <td className="px-6 py-4 text-gray-600">{leader.roleEn || leader.role}</td>
                 <td className="px-6 py-4">
                   <div className="flex gap-2">
                     <button onClick={() => editLeader(leader)} className="text-blue-600 hover:text-blue-800 transition-colors">

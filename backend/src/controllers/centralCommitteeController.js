@@ -1,392 +1,342 @@
 const CentralCommittee = require('../models/CentralCommittee');
 const cloudinary = require('../config/cloudinary');
 
-// Get all committee data
+const PROVINCES = [
+  { number: 1, nameEn: 'Koshi Province', nameNe: 'कोशी प्रदेश' },
+  { number: 2, nameEn: 'Madhesh Province', nameNe: 'मधेश प्रदेश' },
+  { number: 3, nameEn: 'Bagmati Province', nameNe: 'बागमती प्रदेश' },
+  { number: 4, nameEn: 'Gandaki Province', nameNe: 'गण्डकी प्रदेश' },
+  { number: 5, nameEn: 'Lumbini Province', nameNe: 'लुम्बिनी प्रदेश' },
+  { number: 6, nameEn: 'Karnali Province', nameNe: 'कर्णाली प्रदेश' },
+  { number: 7, nameEn: 'Sudurpashchim Province', nameNe: 'सुदूरपश्चिम प्रदेश' },
+];
+
+const getData = async () => {
+  let data = await CentralCommittee.findOne();
+  if (!data) {
+    data = await CentralCommittee.create({ members: [] });
+  }
+  return data;
+};
+
+// GET all members (with optional filters)
 const getMembers = async (req, res) => {
   try {
-    let data = await CentralCommittee.findOne();
-    if (!data) {
-      data = await CentralCommittee.create({
-        title: 'केन्द्रीय कार्यसमिति',
-        members: [],
-        districtTitle: 'जिल्ला कार्यसमिति',
-        districtMembers: [],
-        regionalTitle: 'क्षेत्रीय सभापति',
-        regionalMembers: [],
-        unitTitle: 'इकाई सभापति',
-        unitMembers: [],
-        provincialTitle: 'प्रदेश संयोजक',
-        provincialMembers: [],
-        centralMembersTitle: 'केन्द्रीय सदस्य',
-        centralMembers: [],
-        advisoryTitle: 'सलाहकार मण्डल',
-        advisoryMembers: [],
-      });
+    const { section, province, district, search } = req.query;
+    let data = await getData();
+    let members = data.members || [];
+
+    if (section) {
+      members = members.filter(m => m.section === section);
     }
+    if (province) {
+      members = members.filter(m => m.province === province);
+    }
+    if (district) {
+      members = members.filter(m => m.district === district);
+    }
+    if (search) {
+      const s = search.toLowerCase();
+      members = members.filter(m =>
+        (m.name || '').toLowerCase().includes(s) ||
+        (m.nameEn || '').toLowerCase().includes(s) ||
+        (m.nameNe || '').toLowerCase().includes(s) ||
+        (m.role || '').toLowerCase().includes(s) ||
+        (m.roleEn || '').toLowerCase().includes(s) ||
+        (m.roleNe || '').toLowerCase().includes(s) ||
+        (m.province || '').toLowerCase().includes(s) ||
+        (m.provinceEn || '').toLowerCase().includes(s) ||
+        (m.district || '').toLowerCase().includes(s) ||
+        (m.districtEn || '').toLowerCase().includes(s)
+      );
+    }
+
+    res.json({ members, total: data.members?.length || 0 });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// GET all (raw document)
+const getAll = async (req, res) => {
+  try {
+    const data = await getData();
     res.json(data);
   } catch (error) {
-    console.error('Get members error:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get members by category
-const getMembersByCategory = async (req, res) => {
-  try {
-    const { category } = req.params;
-    let data = await CentralCommittee.findOne();
-    if (!data) {
-      return res.json([]);
-    }
-    
-    const categoryMap = {
-      'executive': 'members',
-      'district': 'districtMembers',
-      'regional': 'regionalMembers',
-      'unit': 'unitMembers',
-      'provincial': 'provincialMembers',
-      'central': 'centralMembers',
-      'advisory': 'advisoryMembers',
-    };
-    
-    const key = categoryMap[category];
-    if (!key || !data[key]) {
-      return res.json([]);
-    }
-    
-    res.json(data[key]);
-  } catch (error) {
-    console.error('Get members by category error:', error);
-    res.status(500).json({ message: error.message });
-  }
+// GET provinces list
+const getProvinces = async (req, res) => {
+  res.json(PROVINCES);
 };
 
-// Get executive committee
-const getExecutiveCommittee = async (req, res) => {
-  try {
-    let data = await CentralCommittee.findOne();
-    if (!data) {
-      return res.json([]);
-    }
-    res.json(data.members || []);
-  } catch (error) {
-    console.error('Get executive committee error:', error);
-    res.status(500).json({ message: error.message });
-  }
+// GET districts for a province (77 total districts of Nepal)
+const getDistricts = async (req, res) => {
+  const { provinceNumber } = req.params;
+  const districtMap = {
+    // Koshi Province (14 districts)
+    1: [
+      { nameEn: 'Taplejung', nameNe: 'ताप्लेजुङ' },
+      { nameEn: 'Panchthar', nameNe: 'पाँचथर' },
+      { nameEn: 'Ilam', nameNe: 'इलाम' },
+      { nameEn: 'Jhapa', nameNe: 'झापा' },
+      { nameEn: 'Morang', nameNe: 'मोरङ' },
+      { nameEn: 'Sunsari', nameNe: 'सुनसरी' },
+      { nameEn: 'Dhankuta', nameNe: 'धनकुटा' },
+      { nameEn: 'Terhathum', nameNe: 'तेह्रथुम' },
+      { nameEn: 'Sankhuwasabha', nameNe: 'संखुवासभा' },
+      { nameEn: 'Bhojpur', nameNe: 'भोजपुर' },
+      { nameEn: 'Okhaldhunga', nameNe: 'ओखलढुङ्गा' },
+      { nameEn: 'Solukhumbu', nameNe: 'सोलुखुम्बु' },
+      { nameEn: 'Khotang', nameNe: 'खोटाङ' },
+      { nameEn: 'Udayapur', nameNe: 'उदयपुर' },
+    ],
+    // Madhesh Province (8 districts)
+    2: [
+      { nameEn: 'Saptari', nameNe: 'सप्तरी' },
+      { nameEn: 'Siraha', nameNe: 'सिरहा' },
+      { nameEn: 'Dhanusha', nameNe: 'धनुषा' },
+      { nameEn: 'Mahottari', nameNe: 'महोत्तरी' },
+      { nameEn: 'Sarlahi', nameNe: 'सर्लाही' },
+      { nameEn: 'Rautahat', nameNe: 'राउटहट' },
+      { nameEn: 'Bara', nameNe: 'बारा' },
+      { nameEn: 'Parsa', nameNe: 'पर्सा' },
+    ],
+    // Bagmati Province (13 districts)
+    3: [
+      { nameEn: 'Dolakha', nameNe: 'दोलखा' },
+      { nameEn: 'Ramechhap', nameNe: 'रामेछाप' },
+      { nameEn: 'Sindhuli', nameNe: 'सिन्धुली' },
+      { nameEn: 'Kavrepalanchok', nameNe: 'काभ्रेपलाञ्चोक' },
+      { nameEn: 'Bhaktapur', nameNe: 'भक्तपुर' },
+      { nameEn: 'Kathmandu', nameNe: 'काठमाडौँ' },
+      { nameEn: 'Lalitpur', nameNe: 'ललितपुर' },
+      { nameEn: 'Nuwakot', nameNe: 'नुवाकोट' },
+      { nameEn: 'Rasuwa', nameNe: 'रसुवा' },
+      { nameEn: 'Dhading', nameNe: 'धादिङ' },
+      { nameEn: 'Makwanpur', nameNe: 'मकवानपुर' },
+      { nameEn: 'Chitwan', nameNe: 'चितवन' },
+      { nameEn: 'Gorkha', nameNe: 'गोरखा' },
+    ],
+    // Gandaki Province (11 districts)
+    4: [
+      { nameEn: 'Manang', nameNe: 'मनाङ' },
+      { nameEn: 'Mustang', nameNe: 'मुस्ताङ' },
+      { nameEn: 'Myagdi', nameNe: 'म्याग्दी' },
+      { nameEn: 'Kaski', nameNe: 'कास्की' },
+      { nameEn: 'Lamjung', nameNe: 'लमजुङ' },
+      { nameEn: 'Tanahu', nameNe: 'तनहुँ' },
+      { nameEn: 'Nawalparasi East', nameNe: 'नवलपरासी पूर्व' },
+      { nameEn: 'Syangja', nameNe: 'स्याङजा' },
+      { nameEn: 'Palpa', nameNe: 'पाल्पा' },
+      { nameEn: 'Gulmi', nameNe: 'गुल्मी' },
+      { nameEn: 'Baglung', nameNe: 'बागलुङ' },
+    ],
+    // Lumbini Province (12 districts)
+    5: [
+      { nameEn: 'Rupandehi', nameNe: 'रुपन्देही' },
+      { nameEn: 'Kapilvastu', nameNe: 'कपिलवस्तु' },
+      { nameEn: 'Nawalparasi West', nameNe: 'नवलपरासी पश्चिम' },
+      { nameEn: 'Rukum East', nameNe: 'रुकुम पूर्व' },
+      { nameEn: 'Rolpa', nameNe: 'रोल्पा' },
+      { nameEn: 'Pyuthan', nameNe: 'प्युठान' },
+      { nameEn: 'Syanggdia', nameNe: 'स्याङग्दिया' },
+      { nameEn: 'Dang', nameNe: 'दाङ' },
+      { nameEn: 'Banke', nameNe: 'बाँके' },
+      { nameEn: 'Bardiya', nameNe: 'बर्दिया' },
+      { nameEn: 'Surkhet', nameNe: 'सुर्खेत' },
+      { nameEn: 'Dailekh', nameNe: 'दैलेख' },
+    ],
+    // Karnali Province (10 districts)
+    6: [
+      { nameEn: 'Humla', nameNe: 'हुम्ला' },
+      { nameEn: 'Mugu', nameNe: 'मुगु' },
+      { nameEn: 'Dolpa', nameNe: 'डोल्पा' },
+      { nameEn: 'Jumla', nameNe: 'जुम्ला' },
+      { nameEn: 'Kalikot', nameNe: 'कलिकोट' },
+      { nameEn: 'Jajarkot', nameNe: 'जाजरकोट' },
+      { nameEn: 'Rukum West', nameNe: 'रुकुम पश्चिम' },
+      { nameEn: 'Salyan', nameNe: 'सल्यान' },
+      { nameEn: 'Chhanna', nameNe: 'छान्ना' },
+      { nameEn: 'Tribeni', nameNe: 'त्रिवेणी' },
+    ],
+    // Sudurpashchim Province (9 districts)
+    7: [
+      { nameEn: 'Bajhang', nameNe: 'बझाङ' },
+      { nameEn: 'Bajura', nameNe: 'बाजुरा' },
+      { nameEn: 'Achham', nameNe: 'अच्छाम' },
+      { nameEn: 'Doti', nameNe: 'डोटी' },
+      { nameEn: 'Darchula', nameNe: 'दार्चुला' },
+      { nameEn: 'Baitadi', nameNe: 'बैतडी' },
+      { nameEn: 'Dadeldhura', nameNe: 'डडेलधुरा' },
+      { nameEn: 'Kailali', nameNe: 'कैलाली' },
+      { nameEn: 'Kanchanpur', nameNe: 'कञ्चनपुर' },
+    ],
+  };
+  const num = parseInt(provinceNumber);
+  const districts = districtMap[num] || [];
+  res.json(districts);
 };
 
-// Get district committee
-const getDistrictCommittee = async (req, res) => {
-  try {
-    let data = await CentralCommittee.findOne();
-    if (!data) {
-      return res.json([]);
-    }
-    res.json(data.districtMembers || []);
-  } catch (error) {
-    console.error('Get district committee error:', error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Get provincial coordinators
-const getProvincialCoordinators = async (req, res) => {
-  try {
-    let data = await CentralCommittee.findOne();
-    if (!data) {
-      return res.json([]);
-    }
-    res.json(data.provincialMembers || []);
-  } catch (error) {
-    console.error('Get provincial coordinators error:', error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Get central members
-const getCentralMembers = async (req, res) => {
-  try {
-    let data = await CentralCommittee.findOne();
-    if (!data) {
-      return res.json([]);
-    }
-    res.json(data.centralMembers || []);
-  } catch (error) {
-    console.error('Get central members error:', error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Get advisory council
-const getAdvisoryCouncil = async (req, res) => {
-  try {
-    let data = await CentralCommittee.findOne();
-    if (!data) {
-      return res.json([]);
-    }
-    res.json(data.advisoryMembers || []);
-  } catch (error) {
-    console.error('Get advisory council error:', error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Update entire committee
-const updateCommittee = async (req, res) => {
-  try {
-    let data = await CentralCommittee.findOne();
-    if (!data) {
-      data = new CentralCommittee();
-    }
-
-    const {
-      title,
-      members,
-      districtTitle,
-      districtMembers,
-      regionalTitle,
-      regionalMembers,
-      unitTitle,
-      unitMembers,
-      provincialTitle,
-      provincialMembers,
-      centralMembersTitle,
-      centralMembers,
-      advisoryTitle,
-      advisoryMembers,
-    } = req.body;
-
-    if (title) data.title = title;
-    if (members) data.members = members;
-    if (districtTitle) data.districtTitle = districtTitle;
-    if (districtMembers) data.districtMembers = districtMembers;
-    if (regionalTitle) data.regionalTitle = regionalTitle;
-    if (regionalMembers) data.regionalMembers = regionalMembers;
-    if (unitTitle) data.unitTitle = unitTitle;
-    if (unitMembers) data.unitMembers = unitMembers;
-    if (provincialTitle) data.provincialTitle = provincialTitle;
-    if (provincialMembers) data.provincialMembers = provincialMembers;
-    if (centralMembersTitle) data.centralMembersTitle = centralMembersTitle;
-    if (centralMembers) data.centralMembers = centralMembers;
-    if (advisoryTitle) data.advisoryTitle = advisoryTitle;
-    if (advisoryMembers) data.advisoryMembers = advisoryMembers;
-
-    await data.save();
-    res.json(data);
-  } catch (error) {
-    console.error('Update committee error:', error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Add member to specific section
+// ADD member
 const addMember = async (req, res) => {
   try {
-    const { section } = req.params;
-    const { name, role, bio } = req.body;
-    
-    console.log('=== ADD MEMBER ===');
-    console.log('Section:', section);
-    console.log('Body:', { name, role, bio });
-    console.log('File:', req.file ? req.file.path : 'No file');
+    const data = await getData();
+    const { name, nameEn, nameNe, role, roleEn, roleNe, bio, bioEn, bioNe, section, province, provinceEn, provinceNe, provinceNumber, district, districtEn, districtNe, electionDate } = req.body;
 
-    // Validate required fields
-    if (!name || !role) {
-      return res.status(400).json({ message: 'Name and role are required' });
+    if (!name && !nameEn && !nameNe) {
+      return res.status(400).json({ message: 'Name is required' });
     }
 
-    let data = await CentralCommittee.findOne();
-    if (!data) {
-      data = new CentralCommittee();
-      await data.save();
-    }
-
-    // Get the section array
-    let sectionArray = data[section];
-    if (!sectionArray) {
-      sectionArray = [];
-      data[section] = sectionArray;
-    }
-
-    // Prepare member data
     const newMember = {
-      name: name.trim(),
-      role: role.trim(),
-      bio: bio ? bio.trim() : '',
-      image: req.file ? req.file.path || req.file.secure_url || '' : '',
-      publicId: req.file ? req.file.filename || req.file.public_id || '' : '',
-      order: sectionArray.length,
+      name: name || nameEn || nameNe || '',
+      nameEn: nameEn || nameNe || name || '',
+      nameNe: nameNe || nameEn || name || '',
+      role: role || roleEn || roleNe || '',
+      roleEn: roleEn || roleNe || role || '',
+      roleNe: roleNe || roleEn || role || '',
+      bio: bio || bioEn || bioNe || '',
+      bioEn: bioEn || bioNe || bio || '',
+      bioNe: bioNe || bioEn || bio || '',
+      image: req.file ? (req.file.path || req.file.secure_url || '') : '',
+      publicId: req.file ? (req.file.filename || req.file.public_id || '') : '',
+      section: section || 'centralMembers',
+      province: province || '',
+      provinceEn: provinceEn || province || '',
+      provinceNe: provinceNe || province || '',
+      provinceNumber: parseInt(provinceNumber) || 0,
+      district: district || '',
+      districtEn: districtEn || district || '',
+      districtNe: districtNe || district || '',
+      electionDate: electionDate || null,
+      active: req.body.active === 'false' || req.body.active === false ? false : true,
+      order: (data.members || []).length,
     };
 
-    console.log('New member data:', newMember);
-
-    sectionArray.push(newMember);
+    data.members.push(newMember);
     await data.save();
-    
-    console.log('Member added successfully');
     res.status(201).json(data);
   } catch (error) {
-    console.error('Add member error:', error);
-    res.status(500).json({ message: error.message, stack: error.stack });
-  }
-};
-
-// Update member in specific section
-const updateMember = async (req, res) => {
-  try {
-    const { section, index } = req.params;
-    const { name, role, bio } = req.body;
-    
-    console.log('=== UPDATE MEMBER ===');
-    console.log('Section:', section);
-    console.log('Index:', index);
-    console.log('Body:', { name, role, bio });
-    console.log('File:', req.file ? req.file.path : 'No file');
-
-    // Validate required fields
-    if (!name || !role) {
-      return res.status(400).json({ message: 'Name and role are required' });
-    }
-
-    let data = await CentralCommittee.findOne();
-    if (!data) {
-      return res.status(404).json({ message: 'Data not found' });
-    }
-
-    let sectionArray = data[section];
-    if (!sectionArray || !sectionArray[index]) {
-      return res.status(404).json({ message: 'Member not found' });
-    }
-
-    // Delete old image from Cloudinary if new file is uploaded
-    if (req.file && sectionArray[index].publicId) {
-      try {
-        await cloudinary.uploader.destroy(sectionArray[index].publicId);
-        console.log('Old image deleted:', sectionArray[index].publicId);
-      } catch (error) {
-        console.error('Error deleting old image:', error);
-      }
-    }
-
-    // Update member data
-    sectionArray[index].name = name.trim();
-    sectionArray[index].role = role.trim();
-    sectionArray[index].bio = bio ? bio.trim() : '';
-    
-    if (req.file) {
-      sectionArray[index].image = req.file.path || req.file.secure_url || '';
-      sectionArray[index].publicId = req.file.filename || req.file.public_id || '';
-    }
-
-    await data.save();
-    console.log('Member updated successfully');
-    res.json(data);
-  } catch (error) {
-    console.error('Update member error:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
-// Delete member from specific section
-const deleteMember = async (req, res) => {
+// UPDATE member
+const updateMember = async (req, res) => {
   try {
-    const { section, index } = req.params;
-    
-    console.log('=== DELETE MEMBER ===');
-    console.log('Section:', section);
-    console.log('Index:', index);
+    const { id } = req.params;
+    const data = await getData();
+    const member = data.members.id(id);
+    if (!member) return res.status(404).json({ message: 'Member not found' });
 
-    let data = await CentralCommittee.findOne();
-    if (!data) {
-      return res.status(404).json({ message: 'Data not found' });
+    const fields = ['name', 'nameEn', 'nameNe', 'role', 'roleEn', 'roleNe', 'bio', 'bioEn', 'bioNe', 'section', 'province', 'provinceEn', 'provinceNe', 'provinceNumber', 'district', 'districtEn', 'districtNe', 'electionDate', 'order'];
+    fields.forEach(f => {
+      if (req.body[f] !== undefined) {
+        member[f] = req.body[f];
+      }
+    });
+
+    if (req.body.extended !== undefined) {
+      member.extended = req.body.extended === 'true' || req.body.extended === true;
     }
-
-    let sectionArray = data[section];
-    if (!sectionArray || !sectionArray[index]) {
-      return res.status(404).json({ message: 'Member not found' });
-    }
-
-    // Delete image from Cloudinary if exists
-    if (sectionArray[index].publicId) {
-      try {
-        await cloudinary.uploader.destroy(sectionArray[index].publicId);
-        console.log('Image deleted from Cloudinary:', sectionArray[index].publicId);
-      } catch (error) {
-        console.error('Error deleting image:', error);
+    if (req.body.active !== undefined) {
+      const willBeActive = req.body.active === 'true' || req.body.active === true;
+      member.active = willBeActive;
+      if (willBeActive) {
+        member.inactiveReason = '';
+        member.inactiveDate = null;
+      } else {
+        if (req.body.inactiveReason !== undefined) {
+          member.inactiveReason = req.body.inactiveReason;
+        }
+        member.inactiveDate = new Date();
       }
     }
+    if (req.body.electionDate !== undefined) {
+      member.electionDate = req.body.electionDate ? new Date(req.body.electionDate) : null;
+    }
+    if (req.body.termYears !== undefined) {
+      member.termYears = parseInt(req.body.termYears) || 5;
+    }
 
-    sectionArray.splice(index, 1);
-    // Reorder remaining members
-    sectionArray.forEach((member, i) => {
-      member.order = i;
+    if (req.file) {
+      if (member.publicId) {
+        try { await cloudinary.uploader.destroy(member.publicId); } catch (e) {}
+      }
+      member.image = req.file.path || req.file.secure_url || '';
+      member.publicId = req.file.filename || req.file.public_id || '';
+    }
+
+    await data.save();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// DELETE member
+const deleteMember = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = await getData();
+    const member = data.members.id(id);
+    if (!member) return res.status(404).json({ message: 'Member not found' });
+
+    if (member.publicId) {
+      try { await cloudinary.uploader.destroy(member.publicId); } catch (e) {}
+    }
+
+    data.members.pull(id);
+    await data.save();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// EXTEND member term
+const extendTerm = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = await getData();
+    const member = data.members.id(id);
+    if (!member) return res.status(404).json({ message: 'Member not found' });
+
+    member.extended = true;
+    await data.save();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// BULK update section order
+const updateOrder = async (req, res) => {
+  try {
+    const { members: orderedMembers } = req.body;
+    const data = await getData();
+    
+    if (!Array.isArray(orderedMembers)) {
+      return res.status(400).json({ message: 'Invalid data' });
+    }
+
+    orderedMembers.forEach(update => {
+      const member = data.members.id(update.id);
+      if (member) {
+        member.order = update.order;
+      }
     });
 
     await data.save();
-    console.log('Member deleted successfully');
     res.json(data);
   } catch (error) {
-    console.error('Delete member error:', error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Update section title
-const updateSectionTitle = async (req, res) => {
-  try {
-    const { section } = req.params;
-    const { title } = req.body;
-    
-    console.log('=== UPDATE SECTION TITLE ===');
-    console.log('Section:', section);
-    console.log('Title:', title);
-
-    if (!title) {
-      return res.status(400).json({ message: 'Title is required' });
-    }
-
-    let data = await CentralCommittee.findOne();
-    if (!data) {
-      data = new CentralCommittee();
-    }
-
-    const titleMap = {
-      'members': 'title',
-      'districtMembers': 'districtTitle',
-      'regionalMembers': 'regionalTitle',
-      'unitMembers': 'unitTitle',
-      'provincialMembers': 'provincialTitle',
-      'centralMembers': 'centralMembersTitle',
-      'advisoryMembers': 'advisoryTitle',
-    };
-
-    const titleField = titleMap[section];
-    if (titleField) {
-      data[titleField] = title.trim();
-    } else {
-      return res.status(400).json({ message: 'Invalid section' });
-    }
-
-    await data.save();
-    console.log('Title updated successfully');
-    res.json(data);
-  } catch (error) {
-    console.error('Update section title error:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
 module.exports = {
-  getMembers,
-  getMembersByCategory,
-  getExecutiveCommittee,
-  getDistrictCommittee,
-  getProvincialCoordinators,
-  getCentralMembers,
-  getAdvisoryCouncil,
-  updateCommittee,
-  addMember,
-  updateMember,
-  deleteMember,
-  updateSectionTitle,
+  getMembers, getAll, getProvinces, getDistricts,
+  addMember, updateMember, deleteMember, extendTerm, updateOrder,
 };

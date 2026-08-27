@@ -1,9 +1,10 @@
 const Interview = require('../models/Interview');
 const cloudinary = require('../config/cloudinary');
 
-// @desc    Get all interviews
-// @route   GET /api/interviews
-// @access  Public
+const isValidUrl = (string) => {
+  try { new URL(string); return true; } catch (_) { return false; }
+};
+
 const getInterviews = async (req, res) => {
   try {
     const interviews = await Interview.find().sort({ date: -1, createdAt: -1 });
@@ -13,99 +14,77 @@ const getInterviews = async (req, res) => {
   }
 };
 
-// @desc    Get single interview
-// @route   GET /api/interviews/:id
-// @access  Public
 const getInterviewById = async (req, res) => {
   try {
     const interview = await Interview.findById(req.params.id);
-    if (!interview) {
-      return res.status(404).json({ message: 'Interview not found' });
-    }
+    if (!interview) return res.status(404).json({ message: 'Interview not found' });
     res.json(interview);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// @desc    Create an interview
-// @route   POST /api/interviews
-// @access  Private (Admin only)
 const createInterview = async (req, res) => {
   try {
-    const { title, guest, team, content, type, videoUrl, date } = req.body;
-    
-    if (!title || !guest || !content) {
-      return res.status(400).json({ message: 'Title, guest name, and content are required' });
-    }
+    const { title, titleEn, titleNe, guest, guestEn, guestNe, team, content, contentEn, contentNe, type, videoUrl, date } = req.body;
 
     let imageUrl = '';
     let publicId = '';
-
-    // Handle image upload
     if (req.file) {
       imageUrl = req.file.path || req.file.secure_url || '';
       publicId = req.file.filename || req.file.public_id || '';
     }
 
-    // Handle video URL
     let finalVideoUrl = videoUrl || '';
-    
-    // Validate video URL if provided
     if (finalVideoUrl && !isValidUrl(finalVideoUrl)) {
       return res.status(400).json({ message: 'Invalid video URL format' });
     }
 
     const interview = await Interview.create({
-      title,
-      guest,
+      title: title || titleEn || '',
+      titleEn: titleEn || title || '',
+      titleNe: titleNe || '',
+      guest: guest || guestEn || '',
+      guestEn: guestEn || guest || '',
+      guestNe: guestNe || '',
       team: team || '',
-      content,
+      content: content || contentEn || '',
+      contentEn: contentEn || content || '',
+      contentNe: contentNe || '',
       type: type || (req.file ? 'image' : 'video'),
       image: imageUrl,
       videoUrl: finalVideoUrl,
-      publicId: publicId,
+      publicId,
       date: date || Date.now(),
     });
 
     res.status(201).json(interview);
   } catch (error) {
-    console.error('Create interview error:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
-// Helper function to validate URL
-const isValidUrl = (string) => {
-  try {
-    new URL(string);
-    return true;
-  } catch (_) {
-    return false;
-  }
-};
-
-// @desc    Update an interview
-// @route   PUT /api/interviews/:id
-// @access  Private (Admin only)
 const updateInterview = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, guest, team, content, type, videoUrl, date } = req.body;
+    const { title, titleEn, titleNe, guest, guestEn, guestNe, team, content, contentEn, contentNe, type, videoUrl, date } = req.body;
     
     const interview = await Interview.findById(id);
-    if (!interview) {
-      return res.status(404).json({ message: 'Interview not found' });
-    }
+    if (!interview) return res.status(404).json({ message: 'Interview not found' });
 
-    interview.title = title || interview.title;
-    interview.guest = guest || interview.guest;
-    interview.team = team !== undefined ? team : interview.team;
-    interview.content = content || interview.content;
-    interview.type = type || interview.type;
-    interview.date = date || interview.date;
+    if (title !== undefined) interview.title = title;
+    if (titleEn !== undefined) interview.titleEn = titleEn;
+    if (titleNe !== undefined) interview.titleNe = titleNe;
+    if (guest !== undefined) interview.guest = guest;
+    if (guestEn !== undefined) interview.guestEn = guestEn;
+    if (guestNe !== undefined) interview.guestNe = guestNe;
+    if (team !== undefined) interview.team = team;
+    if (content !== undefined) interview.content = content;
+    if (contentEn !== undefined) interview.contentEn = contentEn;
+    if (contentNe !== undefined) interview.contentNe = contentNe;
+    if (type !== undefined) interview.type = type;
+    if (date !== undefined) interview.date = date;
     
-    // Handle video URL
     if (videoUrl !== undefined) {
       if (videoUrl && !isValidUrl(videoUrl)) {
         return res.status(400).json({ message: 'Invalid video URL format' });
@@ -113,14 +92,9 @@ const updateInterview = async (req, res) => {
       interview.videoUrl = videoUrl;
     }
 
-    // Handle image update
     if (req.file) {
       if (interview.publicId && interview.publicId !== '') {
-        try {
-          await cloudinary.uploader.destroy(interview.publicId);
-        } catch (error) {
-          console.error('Error deleting old image:', error);
-        }
+        try { await cloudinary.uploader.destroy(interview.publicId); } catch (e) {}
       }
       interview.image = req.file.path || req.file.secure_url || '';
       interview.publicId = req.file.filename || req.file.public_id || '';
@@ -129,42 +103,25 @@ const updateInterview = async (req, res) => {
     await interview.save();
     res.json(interview);
   } catch (error) {
-    console.error('Update interview error:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
-// @desc    Delete an interview
-// @route   DELETE /api/interviews/:id
-// @access  Private (Admin only)
 const deleteInterview = async (req, res) => {
   try {
     const { id } = req.params;
     const interview = await Interview.findById(id);
-    if (!interview) {
-      return res.status(404).json({ message: 'Interview not found' });
-    }
+    if (!interview) return res.status(404).json({ message: 'Interview not found' });
 
     if (interview.publicId && interview.publicId !== '') {
-      try {
-        await cloudinary.uploader.destroy(interview.publicId);
-      } catch (error) {
-        console.error('Error deleting image from Cloudinary:', error);
-      }
+      try { await cloudinary.uploader.destroy(interview.publicId); } catch (e) {}
     }
 
     await interview.deleteOne();
     res.json({ message: 'Interview deleted successfully' });
   } catch (error) {
-    console.error('Delete interview error:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = {
-  getInterviews,
-  getInterviewById,
-  createInterview,
-  updateInterview,
-  deleteInterview,
-};
+module.exports = { getInterviews, getInterviewById, createInterview, updateInterview, deleteInterview };

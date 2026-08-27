@@ -12,10 +12,14 @@ const getNews = async (req, res) => {
 
 const createNews = async (req, res) => {
   try {
-    const { title, content, date } = req.body;
+    const { title, titleEn, titleNe, content, contentEn, contentNe, date } = req.body;
     const news = await News.create({
-      title,
-      content,
+      title: title || titleEn || '',
+      titleEn: titleEn || title || '',
+      titleNe: titleNe || '',
+      content: content || contentEn || '',
+      contentEn: contentEn || content || '',
+      contentNe: contentNe || '',
       date: date || Date.now(),
       image: req.file ? req.file.path : '',
       publicId: req.file ? req.file.filename : '',
@@ -29,16 +33,20 @@ const createNews = async (req, res) => {
 const updateNews = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, content, date } = req.body;
+    const { title, titleEn, titleNe, content, contentEn, contentNe, date } = req.body;
     
     const news = await News.findById(id);
     if (!news) {
       return res.status(404).json({ message: 'News not found' });
     }
 
-    news.title = title || news.title;
-    news.content = content || news.content;
-    news.date = date || news.date;
+    if (title !== undefined) news.title = title;
+    if (titleEn !== undefined) news.titleEn = titleEn;
+    if (titleNe !== undefined) news.titleNe = titleNe;
+    if (content !== undefined) news.content = content;
+    if (contentEn !== undefined) news.contentEn = contentEn;
+    if (contentNe !== undefined) news.contentNe = contentNe;
+    if (date !== undefined) news.date = date;
     
     if (req.file) {
       if (news.publicId) {

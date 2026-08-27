@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Download, FileText, Calendar, Image, Eye, Clock } from 'lucide-react';
 import { noticesAPI, logoAPI } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 import jsPDF from 'jspdf';
 
 const NoticeModal = () => {
+  const { getLocalizedField, isNepali, language } = useLanguage();
   const [selectedNotice, setSelectedNotice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -327,12 +329,12 @@ const NoticeModal = () => {
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
                 <div className="flex-1">
                   <h3 className="text-2xl md:text-3xl font-bold text-army font-display leading-tight">
-                    {selectedNotice.title}
+                    {getLocalizedField(selectedNotice, 'title') || selectedNotice.title}
                   </h3>
                   <div className="flex flex-wrap items-center gap-4 mt-3">
                     <span className="flex items-center gap-2 text-sm text-gray-500">
                       <Calendar className="h-4 w-4 text-gold" />
-                      {new Date(selectedNotice.date).toLocaleDateString('en-US', {
+                      {new Date(selectedNotice.date).toLocaleDateString(isNepali ? 'ne-NP' : 'en-US', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric'
@@ -340,7 +342,7 @@ const NoticeModal = () => {
                     </span>
                     <span className="flex items-center gap-2 text-sm text-gray-500">
                       <Clock className="h-4 w-4 text-gold" />
-                      {new Date(selectedNotice.date).toLocaleTimeString('en-US', {
+                      {new Date(selectedNotice.date).toLocaleTimeString(isNepali ? 'ne-NP' : 'en-US', {
                         hour: '2-digit',
                         minute: '2-digit'
                       })}
@@ -357,7 +359,7 @@ const NoticeModal = () => {
               <div className="prose max-w-none">
                 <div className="bg-gray-50/80 rounded-2xl p-6 border border-gray-100/80 hover:border-gray-200 transition-colors">
                   <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm md:text-base">
-                    {selectedNotice.content}
+                    {getLocalizedField(selectedNotice, 'content') || selectedNotice.content}
                   </p>
                 </div>
               </div>
@@ -381,31 +383,31 @@ const NoticeModal = () => {
           </div>
         </div>
 
-        {/* Action Buttons - Modern Glass Effect */}
-        <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 px-6 py-4">
-          <div className="max-w-4xl mx-auto flex flex-col sm:flex-row gap-3">
+        {/* Action Buttons - Mini Size */}
+        <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 px-6 py-3">
+          <div className="max-w-4xl mx-auto flex flex-col sm:flex-row gap-2">
             <button
               onClick={() => downloadPDF(selectedNotice)}
               disabled={pdfLoading}
-              className="flex-1 bg-gradient-to-r from-gold to-gold-dark text-white py-3 rounded-xl hover:shadow-lg hover:shadow-gold/20 transition-all duration-300 flex items-center justify-center gap-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 bg-gradient-to-r from-gold to-gold-dark text-white py-2 px-4 rounded-lg hover:shadow-lg hover:shadow-gold/20 transition-all duration-300 flex items-center justify-center gap-1.5 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {pdfLoading ? (
                 <>
-                  <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
-                  Generating PDF...
+                  <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+                  Generating...
                 </>
               ) : (
                 <>
-                  <Download className="h-5 w-5" />
+                  <Download className="h-4 w-4" />
                   Download PDF
                 </>
               )}
             </button>
             <button
               onClick={handleClose}
-              className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl hover:bg-gray-200 transition-all duration-300 flex items-center justify-center gap-2 font-medium"
+              className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-all duration-300 flex items-center justify-center gap-1.5 text-sm font-medium"
             >
-              <Eye className="h-5 w-5" />
+              <Eye className="h-4 w-4" />
               Close
             </button>
           </div>

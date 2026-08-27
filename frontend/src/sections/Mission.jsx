@@ -1,17 +1,20 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Container } from '../components/ui/Section';
 
 export function Mission() {
+  const { t } = useTranslation();
+
   return (
     <section className="py-20 bg-gray-50">
       <Container>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="font-display text-3xl md:text-4xl font-bold text-army mt-4">
-              हाम्रो उद्देश्य
+              {t('sections.ourObjectives')}
             </h1>
             <p className="text-gray-600 mt-4 text-lg">
-              नेपाल राष्ट्रिय भूतपूर्व सैनिक संघका उद्देश्यहरू
+              {t('sections.missionText')}
             </p>
           </div>
 

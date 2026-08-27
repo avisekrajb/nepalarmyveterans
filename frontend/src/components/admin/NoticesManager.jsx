@@ -7,11 +7,12 @@ const NoticesManager = () => {
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
-  const [formData, setFormData] = useState({ title: '', content: '', date: '', showInModal: false });
+  const [formData, setFormData] = useState({ title: '', titleEn: '', titleNe: '', content: '', contentEn: '', contentNe: '', date: '', showInModal: false });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [formLang, setFormLang] = useState('en');
 
   useEffect(() => {
     loadNotices();
@@ -47,8 +48,12 @@ const NoticesManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataObj = new FormData();
-    formDataObj.append('title', formData.title);
-    formDataObj.append('content', formData.content);
+    formDataObj.append('title', formData.titleEn || '');
+    formDataObj.append('titleEn', formData.titleEn);
+    formDataObj.append('titleNe', formData.titleNe);
+    formDataObj.append('content', formData.contentEn || '');
+    formDataObj.append('contentEn', formData.contentEn);
+    formDataObj.append('contentNe', formData.contentNe);
     if (formData.date) formDataObj.append('date', formData.date);
     formDataObj.append('showInModal', formData.showInModal);
     if (imageFile) {
@@ -89,7 +94,11 @@ const NoticesManager = () => {
     setEditing(item._id);
     setFormData({
       title: item.title,
+      titleEn: item.titleEn || item.title || '',
+      titleNe: item.titleNe || '',
       content: item.content,
+      contentEn: item.contentEn || item.content || '',
+      contentNe: item.contentNe || '',
       date: item.date ? new Date(item.date).toISOString().split('T')[0] : '',
       showInModal: item.showInModal || false,
     });
@@ -102,42 +111,44 @@ const NoticesManager = () => {
   };
 
   const resetForm = () => {
-    setFormData({ title: '', content: '', date: '', showInModal: false });
+    setFormData({ title: '', titleEn: '', titleNe: '', content: '', contentEn: '', contentNe: '', date: '', showInModal: false });
     setImageFile(null);
     setImagePreview(null);
     setEditing(null);
     setShowForm(false);
+    setFormLang('en');
   };
 
   const toggleModalStatus = async (id, currentStatus) => {
     try {
-      // If setting to true, unset others first
       if (!currentStatus) {
-        // Find the notice
         const notice = notices.find(n => n._id === id);
         if (notice) {
           const formDataObj = new FormData();
-          formDataObj.append('title', notice.title);
-          formDataObj.append('content', notice.content);
+          formDataObj.append('title', notice.titleEn || notice.title);
+          formDataObj.append('titleEn', notice.titleEn || '');
+          formDataObj.append('titleNe', notice.titleNe || '');
+          formDataObj.append('content', notice.contentEn || notice.content);
+          formDataObj.append('contentEn', notice.contentEn || '');
+          formDataObj.append('contentNe', notice.contentNe || '');
           formDataObj.append('showInModal', 'true');
           if (notice.date) formDataObj.append('date', notice.date);
-          
-          // If there's an image, we need to keep it
-          // We'll update without changing the image
           const { data } = await noticesAPI.updateNotice(id, formDataObj);
           setNotices(notices.map(n => n._id === id ? data : n));
           toast.success('Notice set as modal notice');
         }
       } else {
-        // Unset this notice from modal
         const notice = notices.find(n => n._id === id);
         if (notice) {
           const formDataObj = new FormData();
-          formDataObj.append('title', notice.title);
-          formDataObj.append('content', notice.content);
+          formDataObj.append('title', notice.titleEn || notice.title);
+          formDataObj.append('titleEn', notice.titleEn || '');
+          formDataObj.append('titleNe', notice.titleNe || '');
+          formDataObj.append('content', notice.contentEn || notice.content);
+          formDataObj.append('contentEn', notice.contentEn || '');
+          formDataObj.append('contentNe', notice.contentNe || '');
           formDataObj.append('showInModal', 'false');
           if (notice.date) formDataObj.append('date', notice.date);
-          
           const { data } = await noticesAPI.updateNotice(id, formDataObj);
           setNotices(notices.map(n => n._id === id ? data : n));
           toast.success('Notice removed from modal');
@@ -155,6 +166,29 @@ const NoticesManager = () => {
   const getModalNotice = () => {
     return notices.find(n => n.showInModal === true);
   };
+
+  const LangTabs = () => (
+    <div className="flex bg-gray-100 rounded-lg p-0.5">
+      <button
+        type="button"
+        onClick={() => setFormLang('en')}
+        className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+          formLang === 'en' ? 'bg-white text-army shadow-sm' : 'text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        EN
+      </button>
+      <button
+        type="button"
+        onClick={() => setFormLang('ne')}
+        className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+          formLang === 'ne' ? 'bg-white text-army shadow-sm' : 'text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        NE
+      </button>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -182,7 +216,6 @@ const NoticesManager = () => {
         </button>
       </div>
 
-      {/* Modal Notice Indicator */}
       {modalNotice && (
         <div className="bg-gold/10 border border-gold/30 rounded-lg p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -191,7 +224,7 @@ const NoticesManager = () => {
             </div>
             <div>
               <p className="text-sm font-medium text-army">Modal Notice Active</p>
-              <p className="text-sm text-gray-600">"{modalNotice.title}" is currently showing in the modal</p>
+              <p className="text-sm text-gray-600">"{modalNotice.titleEn || modalNotice.title}" is currently showing in the modal</p>
             </div>
           </div>
           <button
@@ -207,24 +240,52 @@ const NoticesManager = () => {
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-              <input
-                type="text"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
-                required
-              />
+              <div className="flex items-center gap-2 mb-1">
+                <label className="block text-sm font-medium text-gray-700">Title *</label>
+                <LangTabs />
+              </div>
+              {formLang === 'en' ? (
+                <input
+                  type="text"
+                  value={formData.titleEn}
+                  onChange={(e) => setFormData({ ...formData, titleEn: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                  placeholder="Title in English"
+                  required
+                />
+              ) : (
+                <input
+                  type="text"
+                  value={formData.titleNe}
+                  onChange={(e) => setFormData({ ...formData, titleNe: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                  placeholder="Title in Nepali"
+                />
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
-              <textarea
-                value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                rows="4"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
-                required
-              />
+              <div className="flex items-center gap-2 mb-1">
+                <label className="block text-sm font-medium text-gray-700">Content *</label>
+                <LangTabs />
+              </div>
+              {formLang === 'en' ? (
+                <textarea
+                  value={formData.contentEn}
+                  onChange={(e) => setFormData({ ...formData, contentEn: e.target.value })}
+                  rows="4"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                  placeholder="Content in English"
+                  required
+                />
+              ) : (
+                <textarea
+                  value={formData.contentNe}
+                  onChange={(e) => setFormData({ ...formData, contentNe: e.target.value })}
+                  rows="4"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                  placeholder="Content in Nepali"
+                />
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
@@ -340,7 +401,7 @@ const NoticesManager = () => {
                       {hasImageValue ? (
                         <img 
                           src={item.image} 
-                          alt={item.title} 
+                          alt={item.titleEn || item.title} 
                           className="w-12 h-12 rounded object-cover border border-gray-200"
                           onError={(e) => {
                             e.target.onerror = null;
@@ -354,8 +415,8 @@ const NoticesManager = () => {
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-medium text-army">{item.title}</div>
-                      <div className="text-xs text-gray-400 truncate max-w-xs">{item.content}</div>
+                      <div className="font-medium text-army">{item.titleEn || item.title}</div>
+                      {item.titleNe && <div className="text-xs text-gray-400 truncate max-w-xs">{item.titleNe}</div>}
                     </td>
                     <td className="px-6 py-4 text-gray-600 text-sm">
                       {new Date(item.date).toLocaleDateString()}
@@ -428,7 +489,6 @@ const NoticesManager = () => {
         )}
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
           <p className="text-sm text-gray-500">Total Notices</p>
@@ -441,13 +501,13 @@ const NoticesManager = () => {
         <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
           <p className="text-sm text-gray-500">Modal Notice</p>
           <p className="text-lg font-bold text-gold truncate">
-            {modalNotice ? modalNotice.title : 'None set'}
+            {modalNotice ? (modalNotice.titleEn || modalNotice.title) : 'None set'}
           </p>
         </div>
         <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
           <p className="text-sm text-gray-500">Latest Notice</p>
           <p className="text-sm font-medium text-army truncate">
-            {notices.length > 0 ? notices[0].title : 'No notices'}
+            {notices.length > 0 ? (notices[0].titleEn || notices[0].title) : 'No notices'}
           </p>
         </div>
       </div>

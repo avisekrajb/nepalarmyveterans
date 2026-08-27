@@ -1,0 +1,275 @@
+{
+  "websiteInfo": {
+    "name": "Nepal National Ex-Army Association",
+    "nepaliName": "नेपाल राष्ट्रिय भूतपूर्व सैनिक संघ",
+    "abbreviation": "NNEA",
+    "established": "२०४७ BS (1990 AD)",
+    "registered": "२०७५ BS",
+    "type": "Social Welfare Organization",
+    "under": "Ministry of Defence, Nepal Government",
+    "recognizedBy": "Nepali Army",
+    "worldVeteransFederation": "Member since 2015",
+    "headquarters": "Sainik Smriti Sthal, Pulchok, Lalitpur, Ward No. 3, Kathmandu, Nepal",
+    "officeHours": "Monday to Friday, 10:00 AM - 5:00 PM",
+    "contact": {
+      "phone": "+977-9824380897",
+      "email": "nepalisena@gmail.com",
+      "address": "Morang, Nepal"
+    }
+  },
+  "hero": {
+    "title": "राष्ट्र सेवाबाट समाज सेवातर्फ",
+    "subtitle": "नेपालका भूपू सैनिकहरूको एकता, सम्मान, सेवा र राष्ट्र निर्माणप्रतिको निरन्तर प्रतिबद्धता।"
+  },
+  "about": {
+    "title": "भूपू सैनिकहरूको साझा मञ्च",
+    "subtitle": "सम्मान र सेवाको निरन्तरता",
+    "description": "नेपाल भूपू सैनिक संघ अवकाशप्राप्त नेपाली सैनिकहरूको एक स्वयंसेवी सामाजिक संस्था हो। लामो सैन्य सेवापछि पनि राष्ट्र र समाजप्रतिको जिम्मेवारीलाई निरन्तरता दिँदै यो संस्थाले एकजुट भूपू सैनिक परिवारको निर्माण गरेको छ। कल्याण, स्वास्थ्य सहयोग, सीप विकास, विपद् प्रतिकार्य, रक्तदान अभियान र सामुदायिक विकासजस्ता क्षेत्रमा संस्था सक्रिय रहँदै आएको छ।"
+  },
+  "missionVision": {
+    "mission": "भूपू सैनिकहरूको एकता, कल्याण र समाज सेवामार्फत राष्ट्र निर्माणमा योगदान।",
+    "vision": "मर्यादित, आत्मनिर्भर र सामाजिक जिम्मेवारीयुक्त भूपू सैनिक समुदाय।",
+    "objectives": "कल्याण, सीप विकास, स्वास्थ्य सेवा, विपद् व्यवस्थापन र सामुदायिक कार्यक्रम।",
+    "coreValues": "अनुशासन, इमानदारी, देशभक्ति, सेवा र आपसी सम्मान।"
+  },
+  "journey": [
+    { "title": "Foundation", "description": "स्थापनाकालमै अवकाशप्राप्त सैनिकहरूको साझा मञ्चको परिकल्पना गरियो।" },
+    { "title": "Early Years", "description": "देशभरका जिल्लामा शाखा विस्तार र सदस्य दर्ताको सुरुवात।" },
+    { "title": "Growth", "description": "स्वास्थ्य शिविर, राहत वितरण र परिवार सहयोग कार्यक्रमको थालनी।" },
+    { "title": "Today", "description": "७७ वटै जिल्लामा प्रतिनिधित्व र निरन्तर सामुदायिक सेवा।" }
+  ],
+  "services": [
+    { "name": "Community Welfare", "description": "स्थानीय समुदायको कल्याणका लागि निरन्तर कार्यक्रम।" },
+    { "name": "Veteran Support", "description": "भूपू सैनिक र आश्रित परिवारलाई प्रत्यक्ष सहयोग।" },
+    { "name": "Medical Assistance", "description": "स्वास्थ्य शिविर र औषधोपचारमा आर्थिक सहायता।" },
+    { "name": "Training Programs", "description": "सीप विकास र पुनःस्थापना तालिम।" },
+    { "name": "Emergency Response", "description": "विपद्को समयमा द्रुत प्रतिकार्य समूह।" },
+    { "name": "Blood Donation", "description": "नियमित रक्तदान अभियानको संचालन।" },
+    { "name": "Disaster Relief", "description": "प्रकोप प्रभावितलाई राहत सामग्री वितरण।" },
+    { "name": "Family Support", "description": "सहिद तथा अवकाशप्राप्त सैनिक परिवारलाई सहयोग।" }
+  ],
+  "statistics": {
+    "totalExArmy": "७०,०००+",
+    "totalDependents": "३,५०,०००+",
+    "totalPopulation": "४,२०,०००+",
+    "districtCommittees": 61,
+    "totalMembers": "२०,५६१",
+    "districtsCovered": 77
+  },
+  "leadership": {
+    "centralCommittee": {
+      "title": "केन्द्रीय सञ्चालन समिति",
+      "totalMembers": 18,
+      "positions": [
+        { "title": "केन्द्रीय सभापति", "name": "स.र श्री दिगम्बर शम्शेर ज.ब.राणा (अ.प्रा.)" },
+        { "title": "वरिष्ठ उपसभापति", "name": "म.उ.से. उद्धव बिष्ट (अ.प्रा.)" },
+        { "title": "उपसभापति", "name": "प्र.से. श्याम सुन्दर घिमिरे (अ.प्रा.)" },
+        { "title": "महासचिव", "name": "स.र. ललित कुमार रायमाझी (अ.प्रा.)" },
+        { "title": "सचिव", "name": "प्र.से. मोहन कुमार थापा (अ.प्रा.)" },
+        { "title": "कोषाध्यक्ष", "name": "प्रा.उ.से. प्रेम बहादुर पाण्डे (अ.प्रा.)" },
+        { "title": "सह-कोषाध्यक्ष", "name": "प्र.से. मोहन कुमार थापा (अ.प्रा.)" }
+      ]
+    },
+    "districtCommittee": {
+      "title": "जिल्ला कार्यसमिति",
+      "members": [
+        { "name": "राम बहादुर थापा", "role": "सभापति" },
+        { "name": "कृष्ण प्रसाद अधिकारी", "role": "उप-सभापति" },
+        { "name": "दुर्गा प्रसाद शर्मा", "role": "सचिव" },
+        { "name": "सुरेश बहादुर कार्की", "role": "सह-सचिव" },
+        { "name": "विष्णु प्रसाद पौडेल", "role": "कोषाध्यक्ष" }
+      ]
+    },
+    "regionalCommittee": {
+      "title": "क्षेत्रीय सभापति",
+      "members": [
+        { "name": "प्रेम बहादुर गुरुङ", "role": "सभापति" }
+      ]
+    },
+    "unitCommittee": {
+      "title": "इकाई सभापति",
+      "members": [
+        { "name": "कुमार बहादुर बस्नेत", "role": "सभापति" }
+      ]
+    },
+    "provincialCoordinators": {
+      "title": "प्रदेश संयोजक",
+      "members": [
+        { "name": "हृदय विक्रम", "role": "कोशी प्रदेश संयोजक" },
+        { "name": "हृदय विक्रम", "role": "मधेश प्रदेश संयोजक" },
+        { "name": "हृदय विक्रम", "role": "बागमती प्रदेश संयोजक" },
+        { "name": "हृदय विक्रम", "role": "गण्डकी प्रदेश संयोजक" },
+        { "name": "हृदय विक्रम", "role": "लुम्बिनी प्रदेश संयोजक" },
+        { "name": "हृदय विक्रम", "role": "कर्णाली प्रदेश संयोजक" },
+        { "name": "हृदय विक्रम", "role": "सुदुरपश्चिम प्रदेश संयोजक" }
+      ]
+    },
+    "centralMembers": {
+      "title": "केन्द्रीय सदस्य",
+      "members": [
+        { "name": "उ.ट.श्री कुन्जी खत्री (अं.ज.)", "role": "केन्द्रिय सदस्य" },
+        { "name": "विष्णु प्रसाद पौडेल", "role": "केन्द्रिय सदस्य" }
+      ]
+    },
+    "advisoryCouncil": {
+      "title": "सलाहकार मण्डल",
+      "members": [
+        { "name": "महारथी श्री अर्जुन नरसिंह राणा", "role": "पूर्व प्रधान सेनापति" },
+        { "name": "महारथी श्री प्यारजंग थापा", "role": "पूर्व प्रधान सेनापति" },
+        { "name": "रथी श्री शुशीलराज कार्की (अ.प्रा.)", "role": "-----" },
+        { "name": "रथी श्री बालानन्द शर्मा (अ.प्रा.)", "role": "-----" },
+        { "name": "रथी श्री नेपाल भूषण चन्द (अ.प्रा)", "role": "-----" },
+        { "name": "मानार्थ रथी श्री यादव बहादुर रायमाभी (अ.प्रा.)", "role": "------" },
+        { "name": "प्राड. उपरथी निरेन्द्र प्रसाद अर्याल (अ.प्रा.)", "role": "-----" },
+        { "name": "मानार्थ प्रा. उपरथी उद्धव बहादुर बिष्ट (अ.प्रा.)", "role": "------" }
+      ]
+    },
+    "currentLeadership": {
+      "title": "वर्तमान केन्द्रीय पदाधिकारीहरू",
+      "members": [
+        { "title": "केन्द्रीय सभापति", "name": "स.र. श्री दिवाकर शमशेर ज.ब. राणा (अ.प्रा.)" },
+        { "title": "वरिष्ठ उपसभापति", "name": "स.र. डा. श्री केशर बहादुर भण्डारी (अ.प्रा.)" },
+        { "title": "महासचिव", "name": "प्र.से. श्री श्याम सुन्दर घिमिरे (अ.प्रा.)" },
+        { "title": "सचिव", "name": "ज.म. श्री केशव बहादुर बस्नेत (अ.प्रा.)" },
+        { "title": "कोषाध्यक्ष", "name": "सु.कृ. श्री केदार बहादुर थापा (अ.प्रा.)" }
+      ]
+    },
+    "centralMembersList": {
+      "title": "केन्द्रीय सदस्यहरू",
+      "members": [
+        { "province": "प्रदेश नं. १", "name": "श्री धन बहादुर खड्का (अ.प्रा.)" },
+        { "province": "प्रदेश नं. २", "name": "ज.म. श्री प्रभु नारायण शिवाकोटी (अ.प्रा.)" },
+        { "province": "प्रदेश नं. ३", "name": "प्र.सु. श्री मोहन कुमार थापा (अ.प्रा.)" },
+        { "province": "प्रदेश नं. ४", "name": "प्र.से. श्री डिल्लीराम बाराल (अ.प्रा.)" },
+        { "province": "प्रदेश नं. ५", "name": "ज.म. श्री इन्द्र बहादुर कुँवर (अ.प्रा.)" },
+        { "province": "प्रदेश नं. ६", "name": "अम. श्री बालकृष्ण पौडेल (अ.प्रा.)" },
+        { "province": "प्रदेश नं. ७", "name": "प्र.सु. श्री मदन सिंह थापा (अ.प्रा.)" },
+        { "province": "", "name": "म.से. श्री विष्णु बहादुर जि.सी. (अ.प्रा.)" },
+        { "province": "", "name": "सु.क. श्री दया कृष्ण न्यौपाने (अ.प्रा.)" }
+      ]
+    }
+  },
+  "history": {
+    "founded": "२०४७ BS",
+    "registered": "२०७५ BS",
+    "description": "नेपाल राष्ट्रिय भूतपूर्व सैनिक संघ नेपाली सेनाबाट अवकाश प्राप्त गरेका भूतपूर्व सैनिकहरू र तिनका परिवारहरूको कल्याण र देश र सेना प्रति पूर्ण आस्था र निष्ठा सहित देश र जनताको रक्षा र सेवा जस्तो मूलभूत आदर्श र लक्ष्य सहित २०४७ सालमा एक विशुद्ध सामाजिक संस्थाको रूपमा स्थापना भई २०७५ सालमा विधिवत् दर्ता भएको हो।",
+    "keyMilestones": [
+      { "year": "२०४७", "title": "Foundation", "description": "संस्थाको स्थापना ५० सदस्यहरूको साथ भयो।" },
+      { "year": "२०७१", "title": "First Convention", "description": "काठमाडौंमा पहिलो राष्ट्रिय सम्मेलन सम्पन्न।" },
+      { "year": "२०७२", "title": "Earthquake Relief", "description": "भूकम्प पीडितहरूलाई राहत र पुनर्निर्माण सहायता।" },
+      { "year": "२०७५", "title": "International Recognition", "description": "दक्षिण एशियाको अग्रणी भूपू सैनिक संस्थाको रूपमा मान्यता।" }
+    ]
+  },
+  "membership": {
+    "eligibility": "Retired army personnel from Nepali Army",
+    "requirements": "Retirement certificate from Nepali Army",
+    "types": [
+      {
+        "name": "General Member",
+        "fee": "Rs. 1,000",
+        "duration": "5 years",
+        "renewal": "Rs. 1,000"
+      },
+      {
+        "name": "Lifetime Member",
+        "fee": "Approved by Central Committee",
+        "duration": "Lifetime",
+        "benefits": "Special rights and privileges"
+      },
+      {
+        "name": "Honorary Member",
+        "fee": "Based on special contribution",
+        "duration": "Lifetime",
+        "benefits": "No voting rights"
+      }
+    ]
+  },
+  "trainingPrograms": [
+    {
+      "name": "Security & Surveillance Training",
+      "duration": "3 Months",
+      "eligibility": "Ex-army personnel",
+      "features": ["CCTV & Surveillance Systems", "Threat Assessment", "Security Protocol", "Emergency Response"]
+    },
+    {
+      "name": "Leadership Development Program",
+      "duration": "2 Months",
+      "eligibility": "Officers and Senior NCOs",
+      "features": ["Strategic Leadership", "Team Building", "Decision Making", "Conflict Resolution"]
+    },
+    {
+      "name": "Community Engagement & Social Work",
+      "duration": "1.5 Months",
+      "eligibility": "All veterans",
+      "features": ["Community Development", "Social Work Methods", "Humanitarian Assistance", "Public Speaking"]
+    },
+    {
+      "name": "Skills Enhancement Program",
+      "duration": "4 Months",
+      "eligibility": "All veterans",
+      "features": ["Entrepreneurship Skills", "Digital Literacy", "Financial Management", "Career Development"]
+    },
+    {
+      "name": "Mental Health & Wellbeing",
+      "duration": "1 Month",
+      "eligibility": "All veterans",
+      "features": ["Mental Health Awareness", "PTSD Management", "Counseling Skills", "Stress Management"]
+    },
+    {
+      "name": "Physical Fitness & Wellness",
+      "duration": "Ongoing",
+      "eligibility": "All veterans",
+      "features": ["Physical Fitness Assessment", "Exercise Programs", "Health Education", "Recreational Activities"]
+    }
+  ],
+  "committees": {
+    "centralCommittee": {
+      "title": "Central Committee",
+      "total": 18,
+      "positions": ["President", "Senior Vice President", "Vice President", "General Secretary", "Secretary (2)", "Treasurer", "Assistant Treasurer", "Members (10)"]
+    },
+    "districtCommittee": {
+      "title": "District Committee",
+      "positions": ["President", "Vice President", "Secretary", "Assistant Secretary", "Treasurer", "Members (as needed)"]
+    },
+    "regionalCommittee": {
+      "title": "Regional/Unit Committee",
+      "total": 15,
+      "positions": ["President", "Vice President", "Secretary", "Assistant Secretary", "Treasurer", "Members (10)"]
+    }
+  },
+  "faqs": [
+    {
+      "question": "संघमा कसरी सदस्य बन्न सकिन्छ?",
+      "answer": "नेपाली सेनाबाट अवकाश प्राप्त सैनिकहरूले संघको सदस्यता लिन सक्नुहुन्छ। सदस्यता शुल्क रु. १,०००/- (५ वर्षको लागि) हो।"
+    },
+    {
+      "question": "सदस्यता लिएको के फाइदा हुन्छ?",
+      "answer": "सदस्यहरूले सहायता सेवाहरू, कल्याणकारी कार्यक्रमहरू, सञ्जाल अवसरहरू, र संघको गतिविधिहरूमा सहभागी हुन पाउँछन्।"
+    },
+    {
+      "question": "संघले कस्ता सेवाहरू प्रदान गर्दछ?",
+      "answer": "सामाजिक कल्याण कार्यक्रम, भूपू सैनिक सहायता, विपद् प्रतिकार्य, सीप विकास, स्वास्थ्य शिविर, रक्तदान अभियान, र सामुदायिक विकास कार्यक्रमहरू।"
+    },
+    {
+      "question": "संघको कार्यालय कहाँ छ?",
+      "answer": "सैनिक स्मारक स्थल, पुल्चोक, ललितपुर, वडा नं. ३, काठमाडौं, नेपाल।"
+    }
+  ],
+  "keywords": {
+    "greetings": ["hello", "hi", "hey", "greetings", "namaste", "howdy", "नमस्ते", "हेलो"],
+    "association": ["association", "organization", "about", "who are you", "what is this", "संघ", "संस्था", "बारे"],
+    "mission": ["mission", "vision", "objective", "purpose", "goal", "aim", "उद्देश्य", "लक्ष्य", "मिसन"],
+    "membership": ["membership", "member", "join", "register", "become member", "sign up", "सदस्य", "सदस्यता"],
+    "fee": ["fee", "cost", "price", "charge", "payment", "money", "शुल्क", "खर्च"],
+    "leadership": ["leader", "leadership", "committee", "president", "sabhapati", "executive", "सभापति", "नेतृत्व", "समिति"],
+    "contact": ["contact", "reach", "call", "phone", "email", "address", "location", "सम्पर्क", "ठेगाना"],
+    "services": ["service", "help", "support", "assistance", "welfare", "benefits", "सेवा", "सहायता"],
+    "training": ["training", "program", "course", "skill", "development", "workshop", "तालिम", "प्रशिक्षण"],
+    "events": ["event", "program", "function", "ceremony", "celebration", "meeting", "कार्यक्रम", "सभा"],
+    "history": ["history", "foundation", "start", "begin", "origin", "established", "इतिहास", "स्थापना"],
+    "statistics": ["statistics", "count", "numbers", "total", "members", "population", "तथ्यांक", "संख्या"],
+    "office": ["office", "visit", "come", "location", "where", "timing", "कार्यालय", "समय"],
+    "help": ["help", "support", "assistance", "guide", "information", "सहयोग", "जानकारी"]
+  }
+}

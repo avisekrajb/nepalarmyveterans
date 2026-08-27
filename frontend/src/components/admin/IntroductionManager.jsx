@@ -5,8 +5,10 @@ import toast from 'react-hot-toast';
 
 const IntroductionManager = () => {
   const [intro, setIntro] = useState({ 
-    title: 'नेपाल राष्ट्रिय भूतपूर्व सैनिक संघ – एक परिचय', 
-    content: '', 
+    titleEn: '', 
+    titleNe: '', 
+    contentEn: '', 
+    contentNe: '', 
     image: '', 
     publicId: '' 
   });
@@ -14,6 +16,7 @@ const IntroductionManager = () => {
   const [saving, setSaving] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [formLang, setFormLang] = useState('en');
 
   useEffect(() => {
     loadIntroduction();
@@ -22,8 +25,14 @@ const IntroductionManager = () => {
   const loadIntroduction = async () => {
     try {
       const { data } = await introductionAPI.getIntroduction();
-      setIntro(data);
-      // If there's an image, set it as preview
+      setIntro({
+        titleEn: data.titleEn || data.title || '',
+        titleNe: data.titleNe || '',
+        contentEn: data.contentEn || data.content || '',
+        contentNe: data.contentNe || '',
+        image: data.image || '',
+        publicId: data.publicId || '',
+      });
       if (data.image) {
         setImagePreview(data.image);
       }
@@ -53,8 +62,12 @@ const IntroductionManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append('title', intro.title);
-    formData.append('content', intro.content);
+    formData.append('title', intro.titleEn || '');
+    formData.append('titleEn', intro.titleEn);
+    formData.append('titleNe', intro.titleNe);
+    formData.append('content', intro.contentEn || '');
+    formData.append('contentEn', intro.contentEn);
+    formData.append('contentNe', intro.contentNe);
     if (imageFile) {
       formData.append('image', imageFile);
     }
@@ -62,7 +75,14 @@ const IntroductionManager = () => {
     setSaving(true);
     try {
       const { data } = await introductionAPI.updateIntroduction(formData);
-      setIntro(data);
+      setIntro({
+        titleEn: data.titleEn || data.title || '',
+        titleNe: data.titleNe || '',
+        contentEn: data.contentEn || data.content || '',
+        contentNe: data.contentNe || '',
+        image: data.image || '',
+        publicId: data.publicId || '',
+      });
       setImageFile(null);
       toast.success('Introduction updated successfully');
     } catch (error) {
@@ -72,6 +92,29 @@ const IntroductionManager = () => {
       setSaving(false);
     }
   };
+
+  const LangTabs = () => (
+    <div className="flex bg-gray-100 rounded-lg p-0.5">
+      <button
+        type="button"
+        onClick={() => setFormLang('en')}
+        className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+          formLang === 'en' ? 'bg-white text-army shadow-sm' : 'text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        EN
+      </button>
+      <button
+        type="button"
+        onClick={() => setFormLang('ne')}
+        className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+          formLang === 'ne' ? 'bg-white text-army shadow-sm' : 'text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        NE
+      </button>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -96,30 +139,56 @@ const IntroductionManager = () => {
       <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Page Title <span className="text-gray-400 text-xs">(Default shown if empty)</span>
-            </label>
-            <input
-              type="text"
-              value={intro.title || ''}
-              onChange={(e) => setIntro({ ...intro, title: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
-              placeholder="नेपाल राष्ट्रिय भूतपूर्व सैनिक संघ – एक परिचय"
-            />
+            <div className="flex items-center gap-2 mb-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Page Title <span className="text-gray-400 text-xs">(Default shown if empty)</span>
+              </label>
+              <LangTabs />
+            </div>
+            {formLang === 'en' ? (
+              <input
+                type="text"
+                value={intro.titleEn || ''}
+                onChange={(e) => setIntro({ ...intro, titleEn: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                placeholder="Page title in English"
+              />
+            ) : (
+              <input
+                type="text"
+                value={intro.titleNe || ''}
+                onChange={(e) => setIntro({ ...intro, titleNe: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                placeholder="Page title in Nepali"
+              />
+            )}
             <p className="text-xs text-gray-400 mt-1">Leave empty to use default title</p>
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Content <span className="text-gray-400 text-xs">(Default content will show if empty)</span>
-            </label>
-            <textarea
-              value={intro.content || ''}
-              onChange={(e) => setIntro({ ...intro, content: e.target.value })}
-              rows="8"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
-              placeholder="Enter introduction content..."
-            />
+            <div className="flex items-center gap-2 mb-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Content <span className="text-gray-400 text-xs">(Default content will show if empty)</span>
+              </label>
+              <LangTabs />
+            </div>
+            {formLang === 'en' ? (
+              <textarea
+                value={intro.contentEn || ''}
+                onChange={(e) => setIntro({ ...intro, contentEn: e.target.value })}
+                rows="8"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                placeholder="Introduction content in English..."
+              />
+            ) : (
+              <textarea
+                value={intro.contentNe || ''}
+                onChange={(e) => setIntro({ ...intro, contentNe: e.target.value })}
+                rows="8"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                placeholder="Introduction content in Nepali..."
+              />
+            )}
             <p className="text-xs text-gray-400 mt-1">Default content will be used if left empty</p>
           </div>
 
@@ -194,7 +263,6 @@ const IntroductionManager = () => {
         </form>
       </div>
 
-      {/* Preview Section */}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
         <h3 className="text-lg font-semibold text-army mb-4 flex items-center gap-2">
           <ImageIcon className="h-5 w-5 text-gold" />
@@ -202,8 +270,11 @@ const IntroductionManager = () => {
         </h3>
         <div className="prose max-w-none">
           <h1 className="font-display text-3xl font-bold text-army">
-            {intro.title || 'नेपाल राष्ट्रिय भूतपूर्व सैनिक संघ – एक परिचय'}
+            {intro.titleEn || intro.titleNe || 'नेपाल राष्ट्रिय भूतपूर्व सैनिक संघ – एक परिचय'}
           </h1>
+          {intro.titleNe && (
+            <p className="text-sm text-gray-500 mt-1">{intro.titleNe}</p>
+          )}
           {imagePreview && (
             <div className="my-4">
               <img 
@@ -214,7 +285,7 @@ const IntroductionManager = () => {
             </div>
           )}
           <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-            {intro.content || 'नेपाल राष्ट्रिय भूतपूर्व सैनिक संघ नेपाली सेनाबाट अवकाश प्राप्त गरेका भूतपूर्व सैनिकहरू र तिनका परिवारहरूको कल्याण र देश र नेपाली भूमिप्रति पूर्ण आस्था र निष्ठा सहित देश र जनताको रक्षा र सेवा गर्ने उद्देश्यले स्थापना भएको हो।'}
+            {intro.contentEn || intro.contentNe || 'नेपाल राष्ट्रिय भूतपूर्व सैनिक संघ नेपाली सेनाबाट अवकाश प्राप्त गरेका भूतपूर्व सैनिकहरू र तिनका परिवारहरूको कल्याण र देश र नेपाली भूमिप्रति पूर्ण आस्था र निष्ठा सहित देश र जनताको रक्षा र सेवा गर्ने उद्देश्यले स्थापना भएको हो।'}
           </div>
         </div>
       </div>

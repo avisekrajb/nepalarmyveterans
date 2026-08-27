@@ -21,22 +21,33 @@ body {
   color: #fff;
 }
 
-/* Custom scrollbar */
+/* Remove scrollbar - Hide completely */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 0px;
+  height: 0px;
+  display: none;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  display: none;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #C9A227;
-  border-radius: 4px;
+  display: none;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9C7D1B;
+  display: none;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: none !important;
+}
+
+/* For IE and Edge */
+* {
+  -ms-overflow-style: none !important;
 }
 
 /* Fade In Animation */
@@ -84,89 +95,171 @@ body {
   transform: scale(1.02);
 }
 
-
-
 /* Notice Modal Animations */
 @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95) translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
   }
-  
-  .animate-fadeIn {
-    animation: fadeIn 0.35s ease-out forwards;
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
-  
-  /* Notice Image Container */
-  .notice-image-container {
-    position: relative;
-    overflow: hidden;
-    background: #f8fafc;
-  }
-  
-  .notice-image-container img {
-    transition: transform 0.3s ease;
-  }
-  
-  .notice-image-container:hover img {
-    transform: scale(1.02);
-  }
-  
-  /* Custom Scrollbar for Modal */
-  .notice-modal-scroll::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .notice-modal-scroll::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-  }
-  
-  .notice-modal-scroll::-webkit-scrollbar-thumb {
-    background: #C9A227;
-    border-radius: 3px;
-  }
-  
-  .notice-modal-scroll::-webkit-scrollbar-thumb:hover {
-    background: #9C7D1B;
-  }
-  
-  /* Line clamp utility */
-  .line-clamp-1 {
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  
-  /* Notice Modal Responsive */
-  @media (max-width: 640px) {
-    .notice-modal-content {
-      padding: 16px;
-    }
-    
-    .notice-modal-image {
-      min-height: 200px;
-      max-height: 250px;
-    }
-  }
+}
 
+.animate-fadeIn {
+  animation: fadeIn 0.35s ease-out forwards;
+}
 
+/* Notice Image Container */
+.notice-image-container {
+  position: relative;
+  overflow: hidden;
+  background: #f8fafc;
+}
 
-  .animate-spin-slow {
-    animation: spin 2s linear infinite;
+.notice-image-container img {
+  transition: transform 0.3s ease;
+}
+
+.notice-image-container:hover img {
+  transform: scale(1.02);
+}
+
+/* Custom Scrollbar for Modal - Keep for modals only */
+.notice-modal-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notice-modal-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.notice-modal-scroll::-webkit-scrollbar-thumb {
+  background: #C9A227;
+  border-radius: 3px;
+}
+
+.notice-modal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #9C7D1B;
+}
+
+/* Line clamp utility */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Notice Modal Responsive */
+@media (max-width: 640px) {
+  .notice-modal-content {
+    padding: 16px;
   }
   
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+  .notice-modal-image {
+    min-height: 200px;
+    max-height: 250px;
   }
+}
+
+.animate-spin-slow {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============ Brand Loader (green + yellow rotating ring) ============ */
+.loader-ring {
+  background: conic-gradient(
+    from 0deg,
+    #22c55e 0%,
+    #22c55e 38%,
+    #fcc202 55%,
+    #fcc202 72%,
+    transparent 72%
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 5px));
+  animation: loaderSpin 1.1s linear infinite;
+}
+
+.loader-arc {
+  border: 2px solid transparent;
+  border-top-color: #fcc202;
+  border-left-color: #22c55e;
+  animation: loaderSpinReverse 2.4s linear infinite;
+}
+
+@keyframes loaderSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loaderSpinReverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.loader-pulse {
+  animation: loaderGlow 1.8s ease-in-out infinite;
+}
+
+@keyframes loaderGlow {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+/* ============ Mini modal pop-in ============ */
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-in {
+  animation: modalIn 0.25s ease-out;
+}
+
+/* ============ Admin sidebar sliding scrollbar ============ */
+.admin-sidebar-scroll {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(250, 204, 21, 0.5) transparent;
+}
+
+.admin-sidebar-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.admin-sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #22c55e, #facc15);
+  border-radius: 9999px;
+}

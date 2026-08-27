@@ -5,12 +5,7 @@ const getIntroduction = async (req, res) => {
   try {
     let intro = await Introduction.findOne();
     if (!intro) {
-      intro = await Introduction.create({
-        title: 'Introduction',
-        content: '',
-        image: '',
-        publicId: '',
-      });
+      intro = await Introduction.create({ title: '', titleEn: '', titleNe: '', content: '', contentEn: '', contentNe: '', image: '', publicId: '' });
     }
     res.json(intro);
   } catch (error) {
@@ -21,18 +16,26 @@ const getIntroduction = async (req, res) => {
 const updateIntroduction = async (req, res) => {
   try {
     let intro = await Introduction.findOne();
-    const { title, content } = req.body;
+    const { title, titleEn, titleNe, content, contentEn, contentNe } = req.body;
 
     if (!intro) {
       intro = await Introduction.create({
-        title: title || 'Introduction',
-        content: content || '',
+        title: title || titleEn || '',
+        titleEn: titleEn || title || '',
+        titleNe: titleNe || '',
+        content: content || contentEn || '',
+        contentEn: contentEn || content || '',
+        contentNe: contentNe || '',
         image: req.file ? req.file.path : '',
         publicId: req.file ? req.file.filename : '',
       });
     } else {
-      intro.title = title || intro.title;
-      intro.content = content || intro.content;
+      if (title !== undefined) intro.title = title;
+      if (titleEn !== undefined) intro.titleEn = titleEn;
+      if (titleNe !== undefined) intro.titleNe = titleNe;
+      if (content !== undefined) intro.content = content;
+      if (contentEn !== undefined) intro.contentEn = contentEn;
+      if (contentNe !== undefined) intro.contentNe = contentNe;
       if (req.file) {
         if (intro.publicId) {
           await cloudinary.uploader.destroy(intro.publicId);
@@ -48,7 +51,4 @@ const updateIntroduction = async (req, res) => {
   }
 };
 
-module.exports = {
-  getIntroduction,
-  updateIntroduction,
-};
+module.exports = { getIntroduction, updateIntroduction };

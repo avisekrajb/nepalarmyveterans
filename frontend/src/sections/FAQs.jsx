@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Container, Eyebrow } from '../components/ui/Section';
 import { 
   ChevronDown, Search, HelpCircle, Users, 
@@ -94,13 +95,14 @@ const faqCategories = [
 ];
 
 const quickLinks = [
-  { icon: Phone, label: 'Call Us', value: '+977-1-1234567', action: 'tel:+97711234567' },
-  { icon: Mail, label: 'Email Us', value: 'info@nepalarmy.org', action: 'mailto:info@nepalarmy.org' },
-  { icon: MapPin, label: 'Visit Us', value: 'Kathmandu, Nepal', action: '/contact' },
-  { icon: Clock, label: 'Office Hours', value: 'Mon-Fri: 10:00 AM - 5:00 PM' },
+  { icon: Phone, labelKey: 'sections.callUs', value: '+977-1-1234567', action: 'tel:+97711234567' },
+  { icon: Mail, labelKey: 'sections.emailUs', value: 'info@nepalarmy.org', action: 'mailto:info@nepalarmy.org' },
+  { icon: MapPin, labelKey: 'sections.visitUs', value: 'Kathmandu, Nepal', action: '/contact' },
+  { icon: Clock, labelKey: 'sections.officeHours', value: 'Mon-Fri: 10:00 AM - 5:00 PM' },
 ];
 
 export function FAQs() {
+  const { t } = useTranslation();
   const [openIndex, setOpenIndex] = useState(null);
   const [activeCategory, setActiveCategory] = useState('general');
   const [searchQuery, setSearchQuery] = useState('');
@@ -131,10 +133,10 @@ export function FAQs() {
           <div className="text-center mb-12">
           
             <h1 className="font-display text-3xl md:text-4xl font-bold text-army mt-4">
-              Frequently Asked Questions
+              {t('sections.faqTitle')}
             </h1>
             <p className="text-gray-600 mt-4 text-lg">
-              Find answers to commonly asked questions about our association, membership, services, and more.
+              {t('sections.faqSubtitle')}
             </p>
           </div>
 
@@ -144,7 +146,7 @@ export function FAQs() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search FAQs..."
+                placeholder={t('sections.searchFaqs')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-gold focus:border-transparent shadow-sm"
@@ -219,7 +221,7 @@ export function FAQs() {
           {/* Quick Help Links */}
           <div className="mt-12">
             <h2 className="font-display text-2xl font-bold text-army text-center mb-6">
-              Still Have Questions?
+              {t('sections.stillHaveQuestions')}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {quickLinks.map((link, index) => {
@@ -232,7 +234,7 @@ export function FAQs() {
                     <div className="bg-gold/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
                       <Icon className="h-6 w-6 text-gold" />
                     </div>
-                    <h4 className="font-medium text-army text-sm">{link.label}</h4>
+                    <h4 className="font-medium text-army text-sm">{t(link.labelKey)}</h4>
                     {link.action ? (
                       <a
                         href={link.action}
@@ -252,7 +254,7 @@ export function FAQs() {
 
           {/* Contact Support */}
           <div className="mt-8 bg-gold/5 p-6 rounded-2xl border border-gold/20 text-center">
-            <h3 className="font-display text-xl font-bold text-army">Need Personalized Support?</h3>
+            <h3 className="font-display text-xl font-bold text-army">{t('sections.needPersonalizedSupport')}</h3>
             <p className="text-gray-600 mt-2">
               Our team is here to help you with any specific questions or concerns.
             </p>
@@ -260,7 +262,7 @@ export function FAQs() {
               href="/contact"
               className="inline-block mt-4 bg-gold text-white px-6 py-2 rounded-lg hover:bg-gold-dark transition-colors"
             >
-              Contact Us
+              {t('sections.contactUsNow')}
             </a>
           </div>
         </div>

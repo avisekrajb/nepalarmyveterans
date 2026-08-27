@@ -1,76 +1,66 @@
 import React from 'react';
-import { Container, Eyebrow } from '../components/ui/Section';
-import { Activity, Users, Heart, Shield, Award, BookOpen } from 'lucide-react';
-
-const programs = [
-  {
-    icon: Users,
-    title: 'Social Welfare Programs',
-    description: 'Organizing health camps, educational programs, and community development initiatives.'
-  },
-  {
-    icon: Heart,
-    title: 'Veterans Assistance',
-    description: 'Providing financial, medical, and social support to retired army personnel and families.'
-  },
-  {
-    icon: Shield,
-    title: 'Disaster Response',
-    description: 'Quick response teams for natural disasters and emergency situations.'
-  },
-  {
-    icon: Activity,
-    title: 'Skills Development',
-    description: 'Vocational training and skills development programs for veterans.'
-  },
-  {
-    icon: BookOpen,
-    title: 'Awareness Programs',
-    description: 'Conducting awareness programs on national security and social issues.'
-  },
-  {
-    icon: Award,
-    title: 'Recognition Events',
-    description: 'Organizing events to honor the sacrifices of army personnel.'
-  }
-];
+import { useTranslation } from 'react-i18next';
+import { Container } from '../components/ui/Section';
 
 export function TaskProgram() {
+  const { t } = useTranslation();
+
+  const programs = [
+    {
+      title: t('sections.socialWelfare'),
+      description: t('sections.socialWelfareDesc')
+    },
+    {
+      title: t('sections.veteransAssistance'),
+      description: t('sections.veteransAssistanceDesc')
+    },
+    {
+      title: t('sections.disasterResponse'),
+      description: t('sections.disasterResponseDesc')
+    },
+    {
+      title: t('sections.skillsDevelopment'),
+      description: t('sections.skillsDevelopmentDesc')
+    },
+    {
+      title: t('sections.awarenessPrograms'),
+      description: t('sections.awarenessProgramsDesc')
+    },
+    {
+      title: t('sections.recognitionEvents'),
+      description: t('sections.recognitionEventsDesc')
+    }
+  ];
   return (
     <section className="py-20 bg-white">
       <Container>
         <div className="max-w-3xl mx-auto text-center mb-12">
-          <Eyebrow>Our Work</Eyebrow>
           <h1 className="font-display text-3xl md:text-4xl font-bold text-army mt-4">
-            Task Programs
+            {t('sections.taskPrograms')}
           </h1>
           <p className="text-gray-600 mt-4 text-lg">
-            Explore our ongoing programs and initiatives that make a difference in society.
+            {t('sections.taskProgramsSubtitle')}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {programs.map((program, index) => {
-            const Icon = program.icon;
-            return (
-              <div key={index} className="group bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all border border-gray-100 hover:border-gold/30">
-                <div className="w-14 h-14 bg-gold/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-gold/20 transition-colors">
-                  <Icon className="h-7 w-7 text-gold" />
-                </div>
-                <h3 className="font-semibold text-army text-lg">{program.title}</h3>
-                <p className="text-gray-600 text-sm mt-2 leading-relaxed">{program.description}</p>
-              </div>
-            );
-          })}
+          {programs.map((program, index) => (
+            <div 
+              key={index} 
+              className="group bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all border border-transparent hover:border-2 hover:border-green-500"
+            >
+              <h3 className="font-semibold text-army text-lg">{program.title}</h3>
+              <p className="text-gray-600 text-sm mt-2 leading-relaxed">{program.description}</p>
+            </div>
+          ))}
         </div>
 
-        <div className="mt-12 bg-army/5 rounded-2xl p-8">
+        <div className="mt-12 bg-army/5 rounded-2xl p-8 border border-transparent hover:border-2 hover:border-green-500 transition-all">
           <h2 className="font-display text-2xl font-bold text-army text-center mb-4">
-            Get Involved
+            {t('sections.getInvolved')}
           </h2>
           <p className="text-gray-600 text-center max-w-2xl mx-auto">
-            Join us in our mission to serve the nation and support our veterans. Your contribution
-            makes a difference in the lives of those who served our country.
+            {t('sections.getInvolvedDesc')}
           </p>
         </div>
       </Container>

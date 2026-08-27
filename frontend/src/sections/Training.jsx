@@ -1,291 +1,153 @@
-import React, { useState } from 'react';
-import { Container, Eyebrow } from '../components/ui/Section';
-import { 
-  Shield, Award, Users, Target, BookOpen, 
-  Clock, CheckCircle, ChevronRight, Calendar,
-  MapPin, Phone, Mail, ExternalLink
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
+import { Container } from '../components/ui/Section';
+import chatbotData from '../data/chatbot.json';
+import {
+  GraduationCap,
+  Clock,
+  UserCheck,
+  CheckCircle2,
+  ShieldCheck,
+  Users,
+  HeartHandshake,
+  Laptop,
+  Brain,
+  Dumbbell,
 } from 'lucide-react';
 
-const trainingPrograms = [
-  {
-    id: 1,
-    icon: Shield,
-    title: 'Security & Surveillance Training',
-    description: 'Comprehensive training in modern security protocols, surveillance techniques, and threat assessment.',
-    duration: '3 Months',
-    eligibility: 'Ex-army personnel',
-    location: 'Kathmandu',
-    status: 'Ongoing',
-    features: [
-      'CCTV & Surveillance Systems',
-      'Threat Assessment & Risk Management',
-      'Security Protocol Implementation',
-      'Emergency Response Planning'
-    ]
-  },
-  {
-    id: 2,
-    icon: Target,
-    title: 'Leadership Development Program',
-    description: 'Advanced leadership and management skills training for veterans transitioning to civilian leadership roles.',
-    duration: '2 Months',
-    eligibility: 'Officers and Senior NCOs',
-    location: 'Kathmandu',
-    status: 'Starting Soon',
-    features: [
-      'Strategic Leadership',
-      'Team Building & Management',
-      'Decision Making Skills',
-      'Conflict Resolution'
-    ]
-  },
-  {
-    id: 3,
-    icon: Users,
-    title: 'Community Engagement & Social Work',
-    description: 'Training on community outreach, social work methodologies, and humanitarian assistance.',
-    duration: '1.5 Months',
-    eligibility: 'All veterans',
-    location: 'Kathmandu',
-    status: 'Enrolling',
-    features: [
-      'Community Development',
-      'Social Work Methods',
-      'Humanitarian Assistance',
-      'Public Speaking & Communication'
-    ]
-  },
-  {
-    id: 4,
-    icon: Award,
-    title: 'Skills Enhancement Program',
-    description: 'Vocational training and professional skills development for career transition and entrepreneurship.',
-    duration: '4 Months',
-    eligibility: 'All veterans',
-    location: 'Kathmandu',
-    status: 'Upcoming',
-    features: [
-      'Entrepreneurship Skills',
-      'Digital Literacy',
-      'Financial Management',
-      'Career Development'
-    ]
-  },
-  {
-    id: 5,
-    icon: BookOpen,
-    title: 'Mental Health & Wellbeing',
-    description: 'Program focused on mental health awareness, PTSD management, and psychological wellbeing for veterans.',
-    duration: '1 Month',
-    eligibility: 'All veterans',
-    location: 'Kathmandu',
-    status: 'Ongoing',
-    features: [
-      'Mental Health Awareness',
-      'PTSD Management',
-      'Counseling Skills',
-      'Stress Management'
-    ]
-  },
-  {
-    id: 6,
-    icon: Clock,
-    title: 'Physical Fitness & Wellness',
-    description: 'Physical fitness programs tailored for veterans, focusing on health, wellness, and active lifestyle.',
-    duration: 'Ongoing',
-    eligibility: 'All veterans',
-    location: 'Kathmandu',
-    status: 'Open',
-    features: [
-      'Physical Fitness Assessment',
-      'Exercise Programs',
-      'Health & Wellness Education',
-      'Recreational Activities'
-    ]
-  }
+const programIcons = [ShieldCheck, Users, HeartHandshake, Laptop, Brain, Dumbbell];
+
+const trainingPrograms = chatbotData.trainingPrograms || [];
+
+const cardColors = [
+  'border-green-500/60',
+  'border-gold/60',
+  'border-green-500/60',
+  'border-gold/60',
+  'border-green-500/60',
+  'border-gold/60',
 ];
 
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.08, duration: 0.5, ease: 'easeOut' },
+  }),
+};
+
 function Training() {
-  const [selectedProgram, setSelectedProgram] = useState(null);
-  const [activeFilter, setActiveFilter] = useState('all');
-
-  const filters = [
-    { id: 'all', label: 'All Programs' },
-    { id: 'Ongoing', label: 'Ongoing' },
-    { id: 'Starting Soon', label: 'Starting Soon' },
-    { id: 'Enrolling', label: 'Enrolling' },
-    { id: 'Open', label: 'Open' },
-  ];
-
-  const filteredPrograms = activeFilter === 'all' 
-    ? trainingPrograms 
-    : trainingPrograms.filter(p => p.status === activeFilter);
-
-  const getStatusColor = (status) => {
-    const colors = {
-      'Ongoing': 'bg-green-500',
-      'Starting Soon': 'bg-yellow-500',
-      'Enrolling': 'bg-blue-500',
-      'Upcoming': 'bg-purple-500',
-      'Open': 'bg-gold',
-    };
-    return colors[status] || 'bg-gray-500';
-  };
-
+  const { t } = useTranslation();
   return (
-    <section className="py-20 bg-white">
+    <section className="py-16 md:py-20 bg-white">
       <Container>
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-     
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <div className="inline-flex items-center gap-2 rounded-full border border-green-500/30 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] text-green-600">
+              <GraduationCap className="h-3.5 w-3.5" />
+              {t('sections.forAllVeterans')}
+            </div>
             <h1 className="font-display text-3xl md:text-4xl font-bold text-army mt-4">
-              Training & Development
+              {t('sections.trainingPrograms')}
             </h1>
-            <p className="text-gray-600 mt-4 text-lg max-w-2xl mx-auto">
-              Equipping our veterans with skills for continued service, personal development, and successful transition to civilian life.
+            <p className="text-gray-600 mt-3 max-w-2xl mx-auto">
+              {t('sections.trainingSubtitle')}
             </p>
-          </div>
+          </motion.div>
 
-          {/* Filters */}
-          <div className="flex flex-wrap gap-2 justify-center mb-8">
-            {filters.map((filter) => (
-              <button
-                key={filter.id}
-                onClick={() => setActiveFilter(filter.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  activeFilter === filter.id
-                    ? 'bg-gold text-white shadow-md'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Training Programs Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredPrograms.map((program) => {
-              const Icon = program.icon;
+          {/* Programs grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {trainingPrograms.map((program, i) => {
+              const Icon = programIcons[i % programIcons.length];
               return (
-                <div
-                  key={program.id}
-                  className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all border border-gray-100 overflow-hidden group"
+                <motion.div
+                  key={program.name}
+                  custom={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.3 }}
+                  variants={fadeInUp}
+                  whileHover={{ y: -6 }}
+                  className={`group flex flex-col bg-white rounded-2xl border-2 ${cardColors[i % cardColors.length]} hover:border-gold p-6 transition-all duration-300 shadow-sm hover:shadow-lg`}
                 >
-                  <div className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="bg-gold/10 p-3 rounded-xl group-hover:bg-gold/20 transition-colors">
-                        <Icon className="h-6 w-6 text-gold" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between">
-                          <h3 className="font-display text-lg font-bold text-army">
-                            {program.title}
-                          </h3>
-                          <span className={`text-xs px-2 py-1 rounded-full text-white ${getStatusColor(program.status)}`}>
-                            {program.status}
-                          </span>
-                        </div>
-                        <p className="text-gray-600 text-sm mt-2">{program.description}</p>
-                        
-                        <div className="flex flex-wrap gap-3 mt-3 text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {program.duration}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
-                            {program.location}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Users className="h-3 w-3" />
-                            {program.eligibility}
-                          </span>
-                        </div>
-
-                        <button
-                          onClick={() => setSelectedProgram(program)}
-                          className="mt-4 text-gold hover:text-gold-dark text-sm font-medium flex items-center gap-1 transition-colors"
-                        >
-                          View Details
-                          <ChevronRight className="h-4 w-4" />
-                        </button>
-                      </div>
+                  {/* Top row */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-green-50 group-hover:bg-gold/10 grid place-items-center transition-colors duration-300">
+                      <Icon className="h-6 w-6 text-green-600 group-hover:text-gold-dark transition-colors duration-300" />
                     </div>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-army px-3 py-1 text-[11px] font-semibold text-white">
+                      <Clock className="h-3 w-3" />
+                      {program.duration}
+                    </span>
                   </div>
-                </div>
+
+                  <h3 className="font-semibold text-army leading-snug">{program.name}</h3>
+
+                  {/* Eligibility */}
+                  <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-gray-400">
+                    <UserCheck className="h-3.5 w-3.5" />
+                    {t('sections.eligibility')}: {program.eligibility}
+                  </p>
+
+                  {/* Features */}
+                  <ul className="mt-4 space-y-2 border-t border-gray-100 pt-4 flex-1">
+                    {(program.features || []).map((feature) => (
+                      <li key={feature} className="flex items-start gap-2 text-sm text-gray-600">
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500 mt-0.5" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
               );
             })}
           </div>
 
-          {filteredPrograms.length === 0 && (
-            <div className="text-center py-12">
-              <BookOpen className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500">No training programs found for this filter.</p>
-            </div>
-          )}
-        </div>
-      </Container>
-
-      {/* Program Detail Modal */}
-      {selectedProgram && (
-        <div
-          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedProgram(null)}
-        >
-          <div
-            className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
+          {/* How to join strip */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="mt-10 rounded-2xl border-2 border-green-200 bg-gray-50 p-6 md:p-8 grid md:grid-cols-3 gap-6"
           >
-            <div className="p-6">
-              <button
-                className="float-right text-gray-400 hover:text-gray-600 transition-colors text-2xl"
-                onClick={() => setSelectedProgram(null)}
-              >
-                ×
-              </button>
-              <h2 className="font-display text-2xl font-bold text-army">{selectedProgram.title}</h2>
-              
-              <div className="flex flex-wrap gap-3 mt-3">
-                <span className={`text-xs px-3 py-1 rounded-full text-white ${getStatusColor(selectedProgram.status)}`}>
-                  {selectedProgram.status}
-                </span>
-                <span className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-600">
-                  {selectedProgram.duration}
-                </span>
-                <span className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-600">
-                  {selectedProgram.location}
-                </span>
-              </div>
-
-              <div className="mt-4 prose max-w-none">
-                <p className="text-gray-700">{selectedProgram.description}</p>
-                <h4 className="font-semibold text-army mt-4">Program Features:</h4>
-                <ul className="space-y-1">
-                  {selectedProgram.features.map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-4 p-4 bg-gold/5 rounded-lg border border-gold/20">
-                  <p className="text-sm text-gray-600">
-                    <strong>Eligibility:</strong> {selectedProgram.eligibility}
-                  </p>
+            {[
+              {
+                step: '01',
+                titleKey: 'sections.registerInterest',
+                descKey: 'sections.registerInterestDesc',
+              },
+              {
+                step: '02',
+                titleKey: 'sections.getScheduled',
+                descKey: 'sections.getScheduledDesc',
+              },
+              {
+                step: '03',
+                titleKey: 'sections.trainAndCertify',
+                descKey: 'sections.trainAndCertifyDesc',
+              },
+            ].map((step) => (
+              <div key={step.step} className="flex items-start gap-4">
+                <span className="font-display text-3xl font-bold text-gold">{step.step}</span>
+                <div>
+                  <h4 className="font-semibold text-army">{t(step.titleKey)}</h4>
+                  <p className="text-sm text-gray-500 leading-relaxed mt-1">{t(step.descKey)}</p>
                 </div>
               </div>
-
-              <button
-                className="mt-6 w-full bg-gold text-white py-2 rounded-lg hover:bg-gold-dark transition-colors"
-                onClick={() => setSelectedProgram(null)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
+            ))}
+          </motion.div>
         </div>
-      )}
+      </Container>
     </section>
   );
 }

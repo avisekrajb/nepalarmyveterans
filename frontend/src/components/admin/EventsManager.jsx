@@ -7,9 +7,10 @@ const EventsManager = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
-  const [formData, setFormData] = useState({ title: '', description: '', date: '', location: '' });
+  const [formData, setFormData] = useState({ title: '', titleEn: '', titleNe: '', description: '', descriptionEn: '', descriptionNe: '', date: '', location: '', locationEn: '', locationNe: '' });
   const [imageFile, setImageFile] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [formLang, setFormLang] = useState('en');
 
   useEffect(() => {
     loadEvents();
@@ -29,8 +30,12 @@ const EventsManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataObj = new FormData();
-    formDataObj.append('title', formData.title);
-    formDataObj.append('description', formData.description);
+    formDataObj.append('title', formData.titleEn || '');
+    formDataObj.append('titleEn', formData.titleEn);
+    formDataObj.append('titleNe', formData.titleNe);
+    formDataObj.append('description', formData.descriptionEn || '');
+    formDataObj.append('descriptionEn', formData.descriptionEn);
+    formDataObj.append('descriptionNe', formData.descriptionNe);
     formDataObj.append('date', formData.date);
     formDataObj.append('location', formData.location);
     if (imageFile) formDataObj.append('image', imageFile);
@@ -66,19 +71,49 @@ const EventsManager = () => {
     setEditing(item._id);
     setFormData({
       title: item.title,
+      titleEn: item.titleEn || item.title || '',
+      titleNe: item.titleNe || '',
       description: item.description || '',
+      descriptionEn: item.descriptionEn || item.description || '',
+      descriptionNe: item.descriptionNe || '',
       date: item.date ? new Date(item.date).toISOString().split('T')[0] : '',
       location: item.location || '',
+      locationEn: item.locationEn || item.location || '',
+      locationNe: item.locationNe || '',
     });
     setShowForm(true);
   };
 
   const resetForm = () => {
-    setFormData({ title: '', description: '', date: '', location: '' });
+    setFormData({ title: '', titleEn: '', titleNe: '', description: '', descriptionEn: '', descriptionNe: '', date: '', location: '', locationEn: '', locationNe: '' });
     setImageFile(null);
     setEditing(null);
     setShowForm(false);
+    setFormLang('en');
   };
+
+  const LangTabs = () => (
+    <div className="flex bg-gray-100 rounded-lg p-0.5">
+      <button
+        type="button"
+        onClick={() => setFormLang('en')}
+        className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+          formLang === 'en' ? 'bg-white text-army shadow-sm' : 'text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        EN
+      </button>
+      <button
+        type="button"
+        onClick={() => setFormLang('ne')}
+        className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+          formLang === 'ne' ? 'bg-white text-army shadow-sm' : 'text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        NE
+      </button>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -105,23 +140,51 @@ const EventsManager = () => {
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-              <input
-                type="text"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
-                required
-              />
+              <div className="flex items-center gap-2 mb-1">
+                <label className="block text-sm font-medium text-gray-700">Title *</label>
+                <LangTabs />
+              </div>
+              {formLang === 'en' ? (
+                <input
+                  type="text"
+                  value={formData.titleEn}
+                  onChange={(e) => setFormData({ ...formData, titleEn: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                  placeholder="Title in English"
+                  required
+                />
+              ) : (
+                <input
+                  type="text"
+                  value={formData.titleNe}
+                  onChange={(e) => setFormData({ ...formData, titleNe: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                  placeholder="Title in Nepali"
+                />
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows="3"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
-              />
+              <div className="flex items-center gap-2 mb-1">
+                <label className="block text-sm font-medium text-gray-700">Description</label>
+                <LangTabs />
+              </div>
+              {formLang === 'en' ? (
+                <textarea
+                  value={formData.descriptionEn}
+                  onChange={(e) => setFormData({ ...formData, descriptionEn: e.target.value })}
+                  rows="3"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                  placeholder="Description in English"
+                />
+              ) : (
+                <textarea
+                  value={formData.descriptionNe}
+                  onChange={(e) => setFormData({ ...formData, descriptionNe: e.target.value })}
+                  rows="3"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+                  placeholder="Description in Nepali"
+                />
+              )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -183,9 +246,12 @@ const EventsManager = () => {
             {events.map((item) => (
               <tr key={item._id}>
                 <td className="px-6 py-4">
-                  <img src={item.image || 'https://placehold.co/50x50/1F3D2B/FFFFFF?text=Event'} alt={item.title} className="w-10 h-10 rounded object-cover" />
+                  <img src={item.image || 'https://placehold.co/50x50/1F3D2B/FFFFFF?text=Event'} alt={item.titleEn || item.title} className="w-10 h-10 rounded object-cover" />
                 </td>
-                <td className="px-6 py-4 font-medium text-army">{item.title}</td>
+                <td className="px-6 py-4">
+                  <div className="font-medium text-army">{item.titleEn || item.title}</div>
+                  {item.titleNe && <div className="text-xs text-gray-400">{item.titleNe}</div>}
+                </td>
                 <td className="px-6 py-4 text-gray-600">{item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}</td>
                 <td className="px-6 py-4 text-gray-600">{item.location || 'N/A'}</td>
                 <td className="px-6 py-4">

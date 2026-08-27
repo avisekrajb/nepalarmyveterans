@@ -10,10 +10,11 @@ const AdminLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar - Desktop */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-army-dark transform transition-transform duration-300 ease-in-out ${
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-army-dark transform transition-transform duration-300 ease-in-out flex flex-col ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0`}>
-        <div className="flex items-center justify-between p-4 border-b border-white/10">
+        {/* Header - fixed */}
+        <div className="flex items-center justify-between p-4 border-b border-white/10 shrink-0">
           <div className="flex items-center gap-2">
             <Shield className="h-8 w-8 text-gold" />
             <span className="text-white font-bold text-lg">Admin Panel</span>
@@ -25,8 +26,14 @@ const AdminLayout = ({ children }) => {
             <X className="h-6 w-6" />
           </button>
         </div>
-        <Sidebar />
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
+
+        {/* Sliding menu area - scrolls up & down */}
+        <nav className="flex-1 min-h-0 overflow-y-auto overscroll-contain admin-sidebar-scroll">
+          <Sidebar />
+        </nav>
+
+        {/* Logout - fixed bottom */}
+        <div className="p-4 border-t border-white/10 shrink-0">
           <button
             onClick={logout}
             className="w-full flex items-center gap-3 px-4 py-2.5 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
