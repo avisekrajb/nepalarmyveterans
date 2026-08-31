@@ -22,7 +22,7 @@ const corsOptions = {
     'http://localhost:4000',
     'https://nepali-sena-complete-website.onrender.com/',
     'https://nepali-sena-complete-backend.onrender.com/',
-    'https://nepalarmyveterans.onrender.com/',
+    'https://nepalarmyveterans.onrender.com',
     'https://nepalarmyveteransbackend.onrender.com/',
     'http://127.0.0.1:4000',
     'http://localhost:3000',
