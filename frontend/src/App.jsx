@@ -35,6 +35,11 @@ import LogoManager from './components/admin/LogoManager';
 import SettingsManager from './components/admin/SettingsManager';
 import InterviewManager from './components/admin/InterviewManager';
 import CentralCommitteeManager from './components/admin/CentralCommitteeManager';
+import TaskProgramManager from './components/admin/TaskProgramManager';
+import FaqManager from './components/admin/FaqManager';
+import FaqConfigManager from './components/admin/FaqConfigManager';
+import TrainingManager from './components/admin/TrainingManager';
+import SecurityRuleManager from './components/admin/SecurityRuleManager';
 
 // Super Admin Components
 import SuperAdminLogin from './sections/SuperAdminLogin';
@@ -154,6 +159,31 @@ function AnimatedRoutes() {
         <Route path="/admin/central-committee" element={
           <ProtectedRoute>
             <AdminLayout><CentralCommitteeManager /></AdminLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/task-programs" element={
+          <ProtectedRoute>
+            <AdminLayout><TaskProgramManager /></AdminLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/faqs" element={
+          <ProtectedRoute>
+            <AdminLayout><FaqManager /></AdminLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/faqs/support" element={
+          <ProtectedRoute>
+            <AdminLayout><FaqConfigManager /></AdminLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/training" element={
+          <ProtectedRoute>
+            <AdminLayout><TrainingManager /></AdminLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/security-rules" element={
+          <ProtectedRoute>
+            <AdminLayout><SecurityRuleManager /></AdminLayout>
           </ProtectedRoute>
         } />
         <Route path="/admin/gallery" element={

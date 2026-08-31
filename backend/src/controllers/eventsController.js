@@ -1,5 +1,6 @@
 const Events = require('../models/Events');
 const cloudinary = require('../config/cloudinary');
+const { logActivity } = require('../middleware/logger');
 
 const getEvents = async (req, res) => {
   try {
@@ -27,6 +28,7 @@ const createEvent = async (req, res) => {
       image: req.file ? req.file.path : '',
       publicId: req.file ? req.file.filename : '',
     });
+    await logActivity({ req, action: 'CREATE', module: 'EVENTS', details: { title: event.title } });
     res.status(201).json(event);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -63,6 +65,7 @@ const updateEvent = async (req, res) => {
     }
 
     await event.save();
+    await logActivity({ req, action: 'UPDATE', module: 'EVENTS', details: { title: event.title } });
     res.json(event);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -82,6 +85,7 @@ const deleteEvent = async (req, res) => {
     }
 
     await event.deleteOne();
+    await logActivity({ req, action: 'DELETE', module: 'EVENTS', details: { title: event.title } });
     res.json({ message: 'Event deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });

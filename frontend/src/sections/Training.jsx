@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Container } from '../components/ui/Section';
 import chatbotData from '../data/chatbot.json';
+import { trainingAPI } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
+import Loader from '../components/ui/Loader';
 import {
   GraduationCap,
   Clock,
@@ -18,7 +21,7 @@ import {
 
 const programIcons = [ShieldCheck, Users, HeartHandshake, Laptop, Brain, Dumbbell];
 
-const trainingPrograms = chatbotData.trainingPrograms || [];
+const fallbackTrainingPrograms = chatbotData.trainingPrograms || [];
 
 const cardColors = [
   'border-green-500/60',
@@ -40,6 +43,46 @@ const fadeInUp = {
 
 function Training() {
   const { t } = useTranslation();
+  const { isNepali } = useLanguage();
+  const [programs, setPrograms] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const { data } = await trainingAPI.getTrainings();
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped = [...data].sort((a, b) => (a.order || 0) - (b.order || 0)).map((p) => ({
+            name: isNepali ? (p.nameNe || p.nameEn || p.name || '') : (p.nameEn || p.nameNe || p.name || ''),
+            duration: p.duration || '',
+            eligibility: isNepali ? (p.eligibilityNe || p.eligibilityEn || p.eligibility || '') : (p.eligibilityEn || p.eligibilityNe || p.eligibility || ''),
+            features: (p.features || []).map((f) => (isNepali ? (f.ne || f.en) : (f.en || f.ne))).filter(Boolean),
+          }));
+          if (mapped.length > 0) {
+            setPrograms(mapped);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load trainings:', error);
+      }
+      setPrograms(fallbackTrainingPrograms);
+      setLoading(false);
+    };
+    load();
+  }, [isNepali]);
+
+  if (loading) {
+    return (
+      <section className="py-16 md:py-20 bg-white flex items-center justify-center min-h-[50vh]">
+        <Loader label="Loading Training Programs" />
+      </section>
+    );
+  }
+
+  const trainingPrograms = programs || [];
+
   return (
     <section className="py-16 md:py-20 bg-white">
       <Container>

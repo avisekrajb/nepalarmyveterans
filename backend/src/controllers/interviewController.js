@@ -1,5 +1,6 @@
 const Interview = require('../models/Interview');
 const cloudinary = require('../config/cloudinary');
+const { logActivity } = require('../middleware/logger');
 
 const isValidUrl = (string) => {
   try { new URL(string); return true; } catch (_) { return false; }
@@ -57,7 +58,7 @@ const createInterview = async (req, res) => {
       publicId,
       date: date || Date.now(),
     });
-
+    await logActivity({ req, action: 'CREATE', module: 'INTERVIEWS', details: { title: interview.title } });
     res.status(201).json(interview);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -101,6 +102,7 @@ const updateInterview = async (req, res) => {
     }
 
     await interview.save();
+    await logActivity({ req, action: 'UPDATE', module: 'INTERVIEWS', details: { title: interview.title } });
     res.json(interview);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -118,6 +120,7 @@ const deleteInterview = async (req, res) => {
     }
 
     await interview.deleteOne();
+    await logActivity({ req, action: 'DELETE', module: 'INTERVIEWS', details: { title: interview.title } });
     res.json({ message: 'Interview deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -42,7 +42,7 @@ import {
   newsAPI, 
   eventsAPI, 
   noticesAPI, 
-  contactAPI,
+  contactMessageAPI,
   heroAPI,
   interviewAPI
 } from '../../services/api';
@@ -82,7 +82,7 @@ const Dashboard = () => {
         newsRes, 
         eventsRes, 
         noticesRes, 
-        contactRes,
+        contactMessagesRes,
         heroRes,
         interviewsRes
       ] = await Promise.all([
@@ -91,7 +91,7 @@ const Dashboard = () => {
         newsAPI.getNews(),
         eventsAPI.getEvents(),
         noticesAPI.getNotices(),
-        contactAPI.getContact(),
+        contactMessageAPI.getMessages().catch(() => ({ data: [] })),
         heroAPI.getHero(),
         interviewAPI.getInterviews()
       ]);
@@ -101,7 +101,7 @@ const Dashboard = () => {
       const newsCount = newsRes.data?.length || 0;
       const eventsCount = eventsRes.data?.length || 0;
       const noticesCount = noticesRes.data?.length || 0;
-      const contactsCount = contactRes.data ? 1 : 0;
+      const contactsCount = (contactMessagesRes.data?.length || 0);
       const interviewsCount = interviewsRes.data?.length || 0;
       const heroImagesCount = heroRes.data?.carouselImages?.length || 0;
       const seniorsCount = heroRes.data?.seniors?.length || 0;

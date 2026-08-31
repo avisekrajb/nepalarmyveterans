@@ -83,7 +83,7 @@ const deleteAdmin = async (req, res) => {
 // Get all logs
 const getLogs = async (req, res) => {
   try {
-    const { page = 1, limit = 50, type } = req.query;
+    const { page = 1, limit = 50, type, search } = req.query;
     const skip = (page - 1) * limit;
 
     let query = {};
@@ -91,6 +91,20 @@ const getLogs = async (req, res) => {
       query = { adminId: { $exists: true } };
     } else if (type === 'visitor') {
       query = { adminId: { $exists: false } };
+    } else if (type === 'system') {
+      query = { adminId: { $exists: false }, module: 'SYSTEM' };
+    }
+
+    if (search && search.trim()) {
+      const s = search.trim();
+      const regex = new RegExp(s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      query.$or = [
+        { adminEmail: regex },
+        { action: regex },
+        { module: regex },
+        { 'details.title': regex },
+        { 'details.name': regex },
+      ];
     }
 
     const logs = await Log.find(query)
@@ -193,7 +207,7 @@ const getCloudinaryImages = async (req, res) => {
 const deleteCloudinaryImage = async (req, res) => {
   try {
     const { publicId } = req.params;
-    await cloudinary.uploader.destroy(publicId);
+    await cloudinary.uploader.destroy(decodeURIComponent(publicId));
     res.json({ message: 'Image deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });

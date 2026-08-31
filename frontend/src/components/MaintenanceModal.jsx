@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Shield, Clock, AlertTriangle, Lock, Calendar, Wrench } from 'lucide-react';
+import { Shield, Clock, AlertTriangle, Lock, Wrench } from 'lucide-react';
 import { settingsAPI } from '../services/api';
 
 const MaintenanceModal = () => {
@@ -12,21 +12,43 @@ const MaintenanceModal = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
+  // Never show the maintenance blocker on admin / superadmin routes so
+  // staff can still log in and disable maintenance.
+  const isAdminRoute = () =>
+    ['/admin', '/superadmin'].some(p => window.location.pathname.startsWith(p));
+
   useEffect(() => {
     checkMaintenance();
+    const interval = setInterval(checkMaintenance, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const checkMaintenance = async () => {
     try {
+      if (isAdminRoute()) {
+        setShowModal(false);
+        setLoading(false);
+        return;
+      }
       const { data } = await settingsAPI.getSettings();
       if (data.maintenanceMode) {
+        const endDate = data.maintenanceEndDate ? new Date(data.maintenanceEndDate) : null;
+        // If end date has passed, maintenance is no longer active.
+        const expired = endDate && new Date() > endDate;
+        if (expired) {
+          setShowModal(false);
+          setLoading(false);
+          return;
+        }
         setMaintenance({
-          maintenanceMode: data.maintenanceMode,
+          maintenanceMode: true,
           maintenanceMessage: data.maintenanceMessage || 'Site is currently under maintenance. Please check back later.',
           maintenanceEndDate: data.maintenanceEndDate,
           lockedSections: data.lockedSections || [],
         });
         setShowModal(true);
+      } else {
+        setShowModal(false);
       }
     } catch (error) {
       console.error('Failed to check maintenance:', error);
@@ -106,13 +128,6 @@ const MaintenanceModal = () => {
               We're working on improving your experience. Please check back later.
             </p>
           </div>
-
-          <button
-            onClick={() => setShowModal(false)}
-            className="w-full mt-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors"
-          >
-            Close
-          </button>
         </div>
       </div>
     </div>

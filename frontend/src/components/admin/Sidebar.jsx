@@ -15,6 +15,10 @@ import {
   Shield,
   MessageSquare,
   DollarSign,
+  ClipboardList,
+  HelpCircle,
+  GraduationCap,
+  Lock,
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -23,6 +27,11 @@ const Sidebar = () => {
     { path: '/admin/hero', icon: Home, label: 'Hero Banner' },
     { path: '/admin/leadership', icon: Users, label: 'Leadership' },
     { path: '/admin/central-committee', icon: Shield, label: 'Central Committee' },
+    { path: '/admin/task-programs', icon: ClipboardList, label: 'Task Programs' },
+    { path: '/admin/faqs', icon: HelpCircle, label: 'FAQs' },
+    { path: '/admin/faqs/support', icon: MessageSquare, label: 'FAQ Support' },
+    { path: '/admin/training', icon: GraduationCap, label: 'Training' },
+    { path: '/admin/security-rules', icon: Lock, label: 'Security Rules' },
     { path: '/admin/gallery', icon: Image, label: 'Gallery' },
     { path: '/admin/news', icon: FileText, label: 'News' },
     { path: '/admin/articles', icon: FileText, label: 'Articles' },

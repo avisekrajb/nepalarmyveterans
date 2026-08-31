@@ -894,14 +894,14 @@ export function Hero() {
                 <div className="aspect-square overflow-hidden bg-gray-100">
                   <img 
                     src={member.image || 'https://placehold.co/400x400/1F3D2B/FFFFFF?text=Photo'} 
-                    alt={member.name} 
+                    alt={getLocalizedField(member, 'name') || member.name} 
                     className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="p-2 md:p-3 text-center">
-                  <h3 className="font-semibold text-army-dark text-sm md:text-sm truncate">{member.name}</h3>
-                  <p className="text-xs md:text-sm text-gold-dark font-semibold truncate">{member.role}</p>
-                  {member.bio && <p className="text-xs md:text-xs text-gray-700 mt-1 line-clamp-2">{member.bio}</p>}
+                  <h3 className="font-semibold text-army-dark text-sm md:text-sm truncate">{getLocalizedField(member, 'name') || member.name}</h3>
+                  <p className="text-xs md:text-sm text-gold-dark font-semibold truncate">{getLocalizedField(member, 'role') || member.role}</p>
+                  {(getLocalizedField(member, 'bio') || member.bio) && <p className="text-xs md:text-xs text-gray-700 mt-1 line-clamp-2">{getLocalizedField(member, 'bio') || member.bio}</p>}
                 </div>
               </motion.div>
             ))}
@@ -948,9 +948,15 @@ export function Hero() {
               >
                 <img 
                   src={item.url} 
-                  alt={item.title || 'Gallery'} 
+                  alt={getLocalizedField(item, 'title') || getLocalizedField(item, 'name') || item.title || 'Gallery'} 
                   className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                {(getLocalizedField(item, 'title') || getLocalizedField(item, 'name') || item.title) && (
+                  <div className="absolute bottom-0 left-0 right-0 p-3 text-white text-sm font-semibold translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+                    {getLocalizedField(item, 'title') || getLocalizedField(item, 'name') || item.title}
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>

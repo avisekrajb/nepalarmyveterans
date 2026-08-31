@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Container } from '../components/ui/Section';
 import { useSite } from '../context/SiteContext';
+import { securityRulesAPI } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
+import Loader from '../components/ui/Loader';
 import {
   ShieldCheck,
   CreditCard,
@@ -16,7 +19,9 @@ import {
   Phone,
 } from 'lucide-react';
 
-const rules = [
+const ruleIcons = [CreditCard, ClipboardList, UserCheck, Siren, Wallet, Lock, HeartPulse, Megaphone];
+
+const fallbackRules = [
   {
     icon: CreditCard,
     titleKey: 'sections.membershipIdRequired',
@@ -70,9 +75,48 @@ const fadeInUp = {
 
 export function SecurityRules() {
   const { t } = useTranslation();
+  const { isNepali } = useLanguage();
   const { contact } = useSite();
+  const [rules, setRules] = useState(null);
+  const [loading, setLoading] = useState(true);
   const phone = contact?.phone || '9824380896';
   const email = contact?.email || 'nepalisena@gmail.com';
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const { data } = await securityRulesAPI.getSecurityRules();
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped = [...data].sort((a, b) => (a.order || 0) - (b.order || 0)).map((rule, i) => ({
+            icon: ruleIcons[i % ruleIcons.length],
+            title: isNepali ? (rule.titleNe || rule.titleEn || rule.title || '') : (rule.titleEn || rule.titleNe || rule.title || ''),
+            desc: isNepali ? (rule.descriptionNe || rule.descriptionEn || rule.description || '') : (rule.descriptionEn || rule.descriptionNe || rule.description || ''),
+          }));
+          if (mapped.length > 0) {
+            setRules(mapped);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load security rules:', error);
+      }
+      setRules(fallbackRules);
+      setLoading(false);
+    };
+    load();
+  }, [isNepali]);
+
+  if (loading) {
+    return (
+      <section className="py-16 md:py-20 bg-gray-50 flex items-center justify-center min-h-[50vh]">
+        <Loader label="Loading Security Rules" />
+      </section>
+    );
+  }
+
+  const resolveTitle = (rule) => (rule.titleKey ? t(rule.titleKey) : rule.title);
+  const resolveDesc = (rule) => (rule.descKey ? t(rule.descKey) : rule.desc);
 
   return (
     <section className="py-16 md:py-20 bg-gray-50">
@@ -102,7 +146,7 @@ export function SecurityRules() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {rules.map((rule, i) => (
               <motion.div
-                key={rule.titleKey}
+                key={i}
                 custom={i}
                 initial="hidden"
                 whileInView="visible"
@@ -117,8 +161,8 @@ export function SecurityRules() {
                 <span className="text-[10px] font-bold uppercase tracking-widest text-gray-300">
                   Rule {String(i + 1).padStart(2, '0')}
                 </span>
-                <h3 className="font-semibold text-army mt-1">{t(rule.titleKey)}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed mt-2">{t(rule.descKey)}</p>
+                <h3 className="font-semibold text-army mt-1">{resolveTitle(rule)}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed mt-2">{resolveDesc(rule)}</p>
               </motion.div>
             ))}
           </div>

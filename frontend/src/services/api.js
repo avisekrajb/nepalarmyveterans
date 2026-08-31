@@ -105,6 +105,7 @@ export const centralCommitteeAPI = {
   },
   deleteMember: (id) => api.delete(`/central-committee/${id}`),
   extendTerm: (id) => api.put(`/central-committee/${id}/extend`),
+  removeExtension: (id) => api.put(`/central-committee/${id}/extend/remove`),
   toggleActive: (id, active) => api.put(`/central-committee/${id}`, { active }),
   updateOrder: (members) => api.put('/central-committee/order/bulk', { members }),
 };
@@ -206,6 +207,44 @@ export const noticesAPI = {
     });
   },
   deleteNotice: (id) => api.delete(`/notices/${id}`),
+};
+
+// ==================== TASK PROGRAMS API ====================
+export const taskProgramAPI = {
+  getTaskPrograms: () => api.get('/task-programs'),
+  createTaskProgram: (data) => api.post('/task-programs', data),
+  updateTaskProgram: (id, data) => api.put(`/task-programs/${id}`, data),
+  deleteTaskProgram: (id) => api.delete(`/task-programs/${id}`),
+};
+
+// ==================== FAQS API ====================
+export const faqAPI = {
+  getFaqs: () => api.get('/faqs'),
+  createFaq: (data) => api.post('/faqs', data),
+  updateFaq: (id, data) => api.put(`/faqs/${id}`, data),
+  deleteFaq: (id) => api.delete(`/faqs/${id}`),
+};
+
+// ==================== FAQ CONFIG API ====================
+export const faqConfigAPI = {
+  getConfig: () => api.get('/faq-config'),
+  updateConfig: (data) => api.put('/faq-config', data),
+};
+
+// ==================== TRAINING API ====================
+export const trainingAPI = {
+  getTrainings: () => api.get('/training'),
+  createTraining: (data) => api.post('/training', data),
+  updateTraining: (id, data) => api.put(`/training/${id}`, data),
+  deleteTraining: (id) => api.delete(`/training/${id}`),
+};
+
+// ==================== SECURITY RULES API ====================
+export const securityRulesAPI = {
+  getSecurityRules: () => api.get('/security-rules'),
+  createSecurityRule: (data) => api.post('/security-rules', data),
+  updateSecurityRule: (id, data) => api.put(`/security-rules/${id}`, data),
+  deleteSecurityRule: (id) => api.delete(`/security-rules/${id}`),
 };
 
 // ==================== INTERVIEWS API ====================
@@ -447,7 +486,7 @@ export const superAdminAPI = {
   
   // Cloudinary Management
   getCloudinaryImages: () => superApi.get('/superadmin/cloudinary'),
-  deleteCloudinaryImage: (publicId) => superApi.delete(`/superadmin/cloudinary/${publicId}`),
+  deleteCloudinaryImage: (publicId) => superApi.delete(`/superadmin/cloudinary/${encodeURIComponent(publicId)}`),
   
   // Settings
   updateLogoSize: (data) => superApi.put('/superadmin/logo-size', data),

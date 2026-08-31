@@ -1,5 +1,6 @@
 const CentralCommittee = require('../models/CentralCommittee');
 const cloudinary = require('../config/cloudinary');
+const { logActivity } = require('../middleware/logger');
 
 const PROVINCES = [
   { number: 1, nameEn: 'Koshi Province', nameNe: 'कोशी प्रदेश' },
@@ -190,6 +191,10 @@ const addMember = async (req, res) => {
       return res.status(400).json({ message: 'Name is required' });
     }
 
+    // Election rule: 5 years is the default term, admin may set up to 6 years.
+    // A term longer than 6 years is not allowed.
+    const termYears = Math.min(Math.max(parseInt(req.body.termYears) || 5, 1), 6);
+
     const newMember = {
       name: name || nameEn || nameNe || '',
       nameEn: nameEn || nameNe || name || '',
@@ -211,12 +216,14 @@ const addMember = async (req, res) => {
       districtEn: districtEn || district || '',
       districtNe: districtNe || district || '',
       electionDate: electionDate || null,
+      termYears,
       active: req.body.active === 'false' || req.body.active === false ? false : true,
       order: (data.members || []).length,
     };
 
     data.members.push(newMember);
     await data.save();
+    await logActivity({ req, action: 'CREATE', module: 'CENTRAL_COMMITTEE', details: { name: newMember.name } });
     res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -258,7 +265,10 @@ const updateMember = async (req, res) => {
       member.electionDate = req.body.electionDate ? new Date(req.body.electionDate) : null;
     }
     if (req.body.termYears !== undefined) {
-      member.termYears = parseInt(req.body.termYears) || 5;
+      const parsed = parseInt(req.body.termYears);
+      if (!isNaN(parsed)) {
+        member.termYears = Math.min(Math.max(parsed, 1), 6);
+      }
     }
 
     if (req.file) {
@@ -270,6 +280,7 @@ const updateMember = async (req, res) => {
     }
 
     await data.save();
+    await logActivity({ req, action: 'UPDATE', module: 'CENTRAL_COMMITTEE', details: { name: member.name } });
     res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -290,13 +301,14 @@ const deleteMember = async (req, res) => {
 
     data.members.pull(id);
     await data.save();
+    await logActivity({ req, action: 'DELETE', module: 'CENTRAL_COMMITTEE', details: { name: member.name } });
     res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// EXTEND member term
+// EXTEND member term (+1 year only, once, and only after 4 years have passed)
 const extendTerm = async (req, res) => {
   try {
     const { id } = req.params;
@@ -304,8 +316,41 @@ const extendTerm = async (req, res) => {
     const member = data.members.id(id);
     if (!member) return res.status(404).json({ message: 'Member not found' });
 
+    if (member.extended) {
+      return res.status(400).json({ message: 'Term can only be extended once by one year' });
+    }
+    if (!member.electionDate) {
+      return res.status(400).json({ message: 'Election date is required before extending the term' });
+    }
+    const yearsPassed = (new Date() - new Date(member.electionDate)) / (1000 * 60 * 60 * 24 * 365);
+    if (yearsPassed < 4 || yearsPassed >= 5) {
+      return res.status(400).json({ message: 'Term can only be extended by one year after 4 years have been completed' });
+    }
+
     member.extended = true;
     await data.save();
+    await logActivity({ req, action: 'EXTEND', module: 'CENTRAL_COMMITTEE', details: { name: member.name } });
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// REMOVE term extension (revert the +1 year)
+const removeExtension = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = await getData();
+    const member = data.members.id(id);
+    if (!member) return res.status(404).json({ message: 'Member not found' });
+
+    if (!member.extended) {
+      return res.status(400).json({ message: 'This member has no active extension to remove' });
+    }
+
+    member.extended = false;
+    await data.save();
+    await logActivity({ req, action: 'REVERT_EXTENSION', module: 'CENTRAL_COMMITTEE', details: { name: member.name } });
     res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -330,6 +375,7 @@ const updateOrder = async (req, res) => {
     });
 
     await data.save();
+    await logActivity({ req, action: 'REORDER', module: 'CENTRAL_COMMITTEE', details: { count: orderedMembers.length } });
     res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -338,5 +384,5 @@ const updateOrder = async (req, res) => {
 
 module.exports = {
   getMembers, getAll, getProvinces, getDistricts,
-  addMember, updateMember, deleteMember, extendTerm, updateOrder,
+  addMember, updateMember, deleteMember, extendTerm, removeExtension, updateOrder,
 };

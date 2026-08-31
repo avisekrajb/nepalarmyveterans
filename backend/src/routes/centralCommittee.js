@@ -4,7 +4,7 @@ const upload = require('../middleware/upload');
 const { protect } = require('../middleware/auth');
 const {
   getMembers, getAll, getProvinces, getDistricts,
-  addMember, updateMember, deleteMember, extendTerm, updateOrder,
+  addMember, updateMember, deleteMember, extendTerm, removeExtension, updateOrder,
 } = require('../controllers/centralCommitteeController');
 
 // Public routes
@@ -17,6 +17,7 @@ router.get('/', getAll);
 router.put('/order/bulk', protect, updateOrder);
 router.post('/', protect, upload.single('image'), addMember);
 router.put('/:id/extend', protect, extendTerm);
+router.put('/:id/extend/remove', protect, removeExtension);
 router.put('/:id', protect, upload.single('image'), updateMember);
 router.delete('/:id', protect, deleteMember);
 

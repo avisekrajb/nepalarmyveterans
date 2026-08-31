@@ -3,7 +3,7 @@ import { centralCommitteeAPI } from '../../services/api';
 import ImageCropperModal from './ImageCropperModal';
 import {
   Plus, Trash2, Edit2, Upload, X, Search, ChevronDown, ChevronRight,
-  Save, Users, Shield, Award, Star, UserPlus, Clock, Calendar, AlertTriangle, Power
+  Save, Users, Shield, Award, Star, UserPlus, Clock, Calendar, AlertTriangle, Power, MinusCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -314,6 +314,17 @@ const CentralCommitteeManager = () => {
     }
   };
 
+  const handleRemoveExtension = async (id) => {
+    if (!window.confirm('Remove the +1 year extension for this member?')) return;
+    try {
+      await centralCommitteeAPI.removeExtension(id);
+      toast.success('Extension removed successfully');
+      loadMembers();
+    } catch (error) {
+      toast.error('Failed to remove extension');
+    }
+  };
+
   const handleToggleActive = async (id, currentActive) => {
     try {
       await centralCommitteeAPI.toggleActive(id, !currentActive);
@@ -486,11 +497,19 @@ const CentralCommitteeManager = () => {
                             ) : (
                               <span className="text-gray-300 text-xs">No date</span>
                             )}
-                            {member.extended && <span className="text-[10px] text-purple-600 font-medium ml-1">Extended</span>}
+                            {member.extended && (
+                              <span className="inline-flex items-center gap-1 text-[10px] text-purple-600 font-medium ml-1">
+                                Extended +1yr
+                                <button onClick={(e) => { e.stopPropagation(); handleRemoveExtension(member._id || member.id); }}
+                                  className="text-red-500 hover:text-red-700 font-medium inline-flex items-center gap-0.5" title="Remove extension">
+                                  <MinusCircle className="h-3 w-3" /> Remove
+                                </button>
+                              </span>
+                            )}
                             {canExtend(member) && (
                               <button onClick={(e) => { e.stopPropagation(); handleExtendTerm(member._id || member.id); }}
                                 className="text-[10px] text-[#C9A227] hover:text-[#b8921f] font-medium ml-1 inline-flex items-center gap-0.5">
-                                <AlertTriangle className="h-2.5 w-2.5" /> Extend
+                                <AlertTriangle className="h-2.5 w-2.5" /> Extend +1 year
                               </button>
                             )}
                           </td>
@@ -705,8 +724,11 @@ const CentralCommitteeManager = () => {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">Term (years)</label>
-                  <input type="number" min="1" max="10" value={formData.termYears} onChange={(e) => setFormData({ ...formData, termYears: e.target.value })}
+                  <input type="number" min="1" max="6" value={formData.termYears} onChange={(e) => setFormData({ ...formData, termYears: e.target.value })}
                     className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#C9A227] focus:border-transparent transition-all" />
+                  <p className="text-[11px] text-gray-400 mt-1">
+                    5 years is the election rule (default). Max 6 years. Extension is +1 year only, available after 4 years.
+                  </p>
                 </div>
               </div>
 

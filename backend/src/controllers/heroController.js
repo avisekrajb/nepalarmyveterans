@@ -1,5 +1,6 @@
 const Hero = require('../models/Hero');
 const cloudinary = require('../config/cloudinary');
+const { logActivity } = require('../middleware/logger');
 
 const getHero = async (req, res) => {
   try {
@@ -33,6 +34,7 @@ const updateHero = async (req, res) => {
     }
 
     await hero.save();
+    await logActivity({ req, action: 'UPDATE', module: 'HERO', details: { updatedFields: ['carouselImages', 'seniors', 'content'].filter(f => req.body[f] !== undefined) } });
     res.json(hero);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -55,6 +57,7 @@ const uploadCarouselImage = async (req, res) => {
     });
 
     await hero.save();
+    await logActivity({ req, action: 'CREATE', module: 'HERO', details: { index: hero.carouselImages.length - 1, title: req.body.title || '' } });
     res.json(hero);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -74,6 +77,7 @@ const deleteCarouselImage = async (req, res) => {
 
     hero.carouselImages.splice(index, 1);
     await hero.save();
+    await logActivity({ req, action: 'DELETE', module: 'HERO', details: { index } });
     res.json(hero);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -95,6 +99,7 @@ const updateCarouselImage = async (req, res) => {
     if (titleNe !== undefined) image.titleNe = titleNe;
 
     await hero.save();
+    await logActivity({ req, action: 'UPDATE', module: 'HERO', details: { index, title: image.title } });
     res.json(hero);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -136,6 +141,7 @@ const addSenior = async (req, res) => {
 
     hero.seniors.push(newSenior);
     await hero.save();
+    await logActivity({ req, action: 'CREATE', module: 'HERO', details: { name: newSenior.name } });
     res.status(201).json(hero);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -155,6 +161,7 @@ const deleteSenior = async (req, res) => {
 
     hero.seniors.splice(index, 1);
     await hero.save();
+    await logActivity({ req, action: 'DELETE', module: 'HERO', details: { index, name: senior?.name || '' } });
     res.json(hero);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -190,6 +197,7 @@ const updateSenior = async (req, res) => {
     }
 
     await hero.save();
+    await logActivity({ req, action: 'UPDATE', module: 'HERO', details: { index, name: senior.name } });
     res.json(hero);
   } catch (error) {
     res.status(500).json({ message: error.message });

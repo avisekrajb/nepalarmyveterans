@@ -1,4 +1,5 @@
 const ContactMessage = require('../models/ContactMessage');
+const { logActivity } = require('../middleware/logger');
 
 // @desc    Get all contact messages
 // @route   GET /api/contact-messages
@@ -50,6 +51,7 @@ const createMessage = async (req, res) => {
       userAgent,
       status: 'unread',
     });
+    await logActivity({ req, action: 'CREATE', module: 'CONTACT_MESSAGE', details: { name: newMessage.name } });
 
     res.status(201).json({
       success: true,
@@ -77,6 +79,7 @@ const updateMessageStatus = async (req, res) => {
 
     message.status = status || message.status;
     await message.save();
+    await logActivity({ req, action: 'STATUS', module: 'CONTACT_MESSAGE', details: { id: message._id, status: message.status } });
 
     res.json({
       success: true,
@@ -100,6 +103,7 @@ const deleteMessage = async (req, res) => {
     }
 
     await message.deleteOne();
+    await logActivity({ req, action: 'DELETE', module: 'CONTACT_MESSAGE', details: { name: message.name } });
     res.json({ success: true, message: 'Message deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });

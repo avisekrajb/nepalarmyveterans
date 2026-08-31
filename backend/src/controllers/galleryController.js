@@ -1,5 +1,6 @@
 const Gallery = require('../models/Gallery');
 const cloudinary = require('../config/cloudinary');
+const { logActivity } = require('../middleware/logger');
 
 const getGallery = async (req, res) => {
   try {
@@ -24,6 +25,7 @@ const uploadGalleryItem = async (req, res) => {
       publicId: req.file.filename,
       size: req.file.size,
     });
+    await logActivity({ req, action: 'CREATE', module: 'GALLERY', details: { title: item.title, type: item.type } });
     res.status(201).json(item);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -55,6 +57,7 @@ const updateGalleryItem = async (req, res) => {
     }
 
     await item.save();
+    await logActivity({ req, action: 'UPDATE', module: 'GALLERY', details: { title: item.title } });
     res.json(item);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -74,6 +77,7 @@ const deleteGalleryItem = async (req, res) => {
     }
 
     await item.deleteOne();
+    await logActivity({ req, action: 'DELETE', module: 'GALLERY', details: { title: item.title } });
     res.json({ message: 'Item deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });

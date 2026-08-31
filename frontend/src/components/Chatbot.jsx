@@ -21,9 +21,28 @@ const Chatbot = () => {
   const [inputText, setInputText] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const recognitionRef = useRef(null);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  const mobileVariants = {
+    initial: { opacity: 0, y: '100%' },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: '100%' },
+  };
+  const desktopVariants = {
+    initial: { opacity: 0, scale: 0.9, y: 20 },
+    animate: { opacity: 1, scale: 1, y: 0 },
+    exit: { opacity: 0, scale: 0.9, y: 20 },
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -175,12 +194,16 @@ const Chatbot = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="fixed bottom-24 right-6 z-[9999] w-[420px] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col"
-            style={{ maxHeight: '600px' }}
+            variants={isMobile ? mobileVariants : desktopVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className={`fixed z-[9999] bg-white shadow-2xl border border-gray-100 overflow-hidden flex flex-col ${
+              isMobile
+                ? 'inset-x-0 bottom-0 h-[85vh] rounded-t-2xl'
+                : 'bottom-24 right-6 w-[420px] max-w-[calc(100vw-2rem)] rounded-2xl max-h-[600px]'
+            }`}
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-army to-army-dark px-4 py-3 flex items-center justify-between flex-shrink-0">

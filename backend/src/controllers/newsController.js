@@ -1,5 +1,6 @@
 const News = require('../models/News');
 const cloudinary = require('../config/cloudinary');
+const { logActivity } = require('../middleware/logger');
 
 const getNews = async (req, res) => {
   try {
@@ -24,6 +25,7 @@ const createNews = async (req, res) => {
       image: req.file ? req.file.path : '',
       publicId: req.file ? req.file.filename : '',
     });
+    await logActivity({ req, action: 'CREATE', module: 'NEWS', details: { title: news.title } });
     res.status(201).json(news);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -57,6 +59,7 @@ const updateNews = async (req, res) => {
     }
 
     await news.save();
+    await logActivity({ req, action: 'UPDATE', module: 'NEWS', details: { title: news.title } });
     res.json(news);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -76,6 +79,7 @@ const deleteNews = async (req, res) => {
     }
 
     await news.deleteOne();
+    await logActivity({ req, action: 'DELETE', module: 'NEWS', details: { title: news.title } });
     res.json({ message: 'News deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });

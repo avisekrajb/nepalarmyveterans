@@ -1,30 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Container, Eyebrow } from '../components/ui/Section';
-import { 
-  ChevronDown, Search, HelpCircle, Users, 
+import { Container } from '../components/ui/Section';
+import { faqAPI, faqConfigAPI } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
+import Loader from '../components/ui/Loader';
+import {
+  ChevronDown, Search, HelpCircle, Users,
   Shield, Award, BookOpen, Heart, Mail, Phone,
-  MapPin, Clock, ExternalLink
+  MapPin, Clock, ExternalLink, MessageSquare
 } from 'lucide-react';
 
-const faqCategories = [
+const FALLBACK_FAQ_CATEGORIES = [
   {
     id: 'general',
     label: 'General',
     icon: HelpCircle,
     questions: [
-      {
-        q: 'What is the Nepal National Ex-Army Association?',
-        a: 'The Nepal National Ex-Army Association is a premier organization dedicated to the welfare and unity of retired army personnel. Established with the vision of serving the nation beyond active service, we bring together veterans who have dedicated their lives to protecting Nepal\'s sovereignty.'
-      },
-      {
-        q: 'When was the association established?',
-        a: 'The association was established in 2010 with 50 founding members. Since then, we have grown to become a leading veterans organization with members across all 77 districts of Nepal.'
-      },
-      {
-        q: 'What is the mission of the association?',
-        a: 'Our mission is to serve the nation and society by leveraging the experience and dedication of ex-army personnel, engage in social welfare activities, provide support to veterans and their families, and contribute to national security awareness.'
-      }
+      { q: 'What is the Nepal National Ex-Army Association?', a: 'The Nepal National Ex-Army Association is a premier organization dedicated to the welfare and unity of retired army personnel. Established with the vision of serving the nation beyond active service, we bring together veterans who have dedicated their lives to protecting Nepal\'s sovereignty.' },
+      { q: 'When was the association established?', a: 'The association was established in 2010 with 50 founding members. Since then, we have grown to become a leading veterans organization with members across all 77 districts of Nepal.' },
+      { q: 'What is the mission of the association?', a: 'Our mission is to serve the nation and society by leveraging the experience and dedication of ex-army personnel, engage in social welfare activities, provide support to veterans and their families, and contribute to national security awareness.' },
     ]
   },
   {
@@ -32,22 +26,10 @@ const faqCategories = [
     label: 'Membership',
     icon: Users,
     questions: [
-      {
-        q: 'Who can join the association?',
-        a: 'Any retired army personnel who has served in the Nepalese Army or its equivalent forces, and is of good character, can apply for membership. We welcome veterans from all ranks and branches of service.'
-      },
-      {
-        q: 'What are the benefits of membership?',
-        a: 'Members enjoy access to support services, welfare programs, networking opportunities, participation in association activities and events, health camps, skills development programs, and a strong community of fellow veterans.'
-      },
-      {
-        q: 'How can I apply for membership?',
-        a: 'You can apply for membership by visiting our office, filling out the membership form, or submitting an online application through our website. Our membership team will guide you through the process.'
-      },
-      {
-        q: 'Is there a membership fee?',
-        a: 'Yes, there is a nominal membership fee that helps support the association\'s activities and programs. The fee structure varies based on membership type and is reviewed periodically.'
-      }
+      { q: 'Who can join the association?', a: 'Any retired army personnel who has served in the Nepalese Army or its equivalent forces, and is of good character, can apply for membership. We welcome veterans from all ranks and branches of service.' },
+      { q: 'What are the benefits of membership?', a: 'Members enjoy access to support services, welfare programs, networking opportunities, participation in association activities and events, health camps, skills development programs, and a strong community of fellow veterans.' },
+      { q: 'How can I apply for membership?', a: 'You can apply for membership by visiting our office, filling out the membership form, or submitting an online application through our website. Our membership team will guide you through the process.' },
+      { q: 'Is there a membership fee?', a: 'Yes, there is a nominal membership fee that helps support the association\'s activities and programs. The fee structure varies based on membership type and is reviewed periodically.' },
     ]
   },
   {
@@ -55,22 +37,10 @@ const faqCategories = [
     label: 'Services & Programs',
     icon: Shield,
     questions: [
-      {
-        q: 'What services does the association provide?',
-        a: 'We provide social welfare programs, veteran assistance, disaster response, skills development, awareness programs, health camps, educational support, and community development initiatives.'
-      },
-      {
-        q: 'Do you provide financial assistance to veterans?',
-        a: 'Yes, we provide financial assistance to veterans and their families in need through our welfare programs. This includes support for medical treatment, educational expenses, and emergency situations.'
-      },
-      {
-        q: 'What training programs are available?',
-        a: 'We offer various training programs including security training, leadership development, community engagement, skills enhancement, mental health awareness, and physical fitness programs.'
-      },
-      {
-        q: 'How can I participate in association activities?',
-        a: 'You can participate by becoming a member, volunteering for our programs, attending events, or contributing to our initiatives. Check our events page for upcoming activities.'
-      }
+      { q: 'What services does the association provide?', a: 'We provide social welfare programs, veteran assistance, disaster response, skills development, awareness programs, health camps, educational support, and community development initiatives.' },
+      { q: 'Do you provide financial assistance to veterans?', a: 'Yes, we provide financial assistance to veterans and their families in need through our welfare programs. This includes support for medical treatment, educational expenses, and emergency situations.' },
+      { q: 'What training programs are available?', a: 'We offer various training programs including security training, leadership development, community engagement, skills enhancement, mental health awareness, and physical fitness programs.' },
+      { q: 'How can I participate in association activities?', a: 'You can participate by becoming a member, volunteering for our programs, attending events, or contributing to our initiatives. Check our events page for upcoming activities.' },
     ]
   },
   {
@@ -78,60 +48,181 @@ const faqCategories = [
     label: 'Support & Assistance',
     icon: Heart,
     questions: [
-      {
-        q: 'How can I contribute to the association?',
-        a: 'You can contribute through membership, volunteering, donations, participating in our programs, spreading awareness about our work, or providing professional expertise to our initiatives.'
-      },
-      {
-        q: 'How is the association governed?',
-        a: 'The association is governed by an elected Central Executive Committee, with an Advisory Council providing strategic guidance. All decisions are made through democratic processes.'
-      },
-      {
-        q: 'Where can I get help as a veteran?',
-        a: 'You can reach out to our office directly, contact our helpline, or visit us during office hours. We have dedicated staff to assist veterans with their needs and concerns.'
-      }
+      { q: 'How can I contribute to the association?', a: 'You can contribute through membership, volunteering, donations, participating in our programs, spreading awareness about our work, or providing professional expertise to our initiatives.' },
+      { q: 'How is the association governed?', a: 'The association is governed by an elected Central Executive Committee, with an Advisory Council providing strategic guidance. All decisions are made through democratic processes.' },
+      { q: 'Where can I get help as a veteran?', a: 'You can reach out to our office directly, contact our helpline, or visit us during office hours. We have dedicated staff to assist veterans with their needs and concerns.' },
     ]
   }
 ];
 
-const quickLinks = [
-  { icon: Phone, labelKey: 'sections.callUs', value: '+977-1-1234567', action: 'tel:+97711234567' },
-  { icon: Mail, labelKey: 'sections.emailUs', value: 'info@nepalarmy.org', action: 'mailto:info@nepalarmy.org' },
-  { icon: MapPin, labelKey: 'sections.visitUs', value: 'Kathmandu, Nepal', action: '/contact' },
-  { icon: Clock, labelKey: 'sections.officeHours', value: 'Mon-Fri: 10:00 AM - 5:00 PM' },
+const QUICK_LINKS = [
+  { icon: 'phone', labelEn: 'Call Us', labelNe: 'हामीलाई फोन गर्नुहोस्', valueEn: '+977-1-1234567', valueNe: '+९७७-१-१२३४५६७', action: 'tel:+97711234567' },
+  { icon: 'mail', labelEn: 'Email Us', labelNe: 'हामीलाई इमेल गर्नुहोस्', valueEn: 'info@nepalarmy.org', valueNe: 'info@nepalarmy.org', action: 'mailto:info@nepalarmy.org' },
+  { icon: 'map', labelEn: 'Visit Us', labelNe: 'हामीलाई भेट्नुहोस्', valueEn: 'Kathmandu, Nepal', valueNe: 'काठमाडौँ, नेपाल', action: '/contact' },
+  { icon: 'clock', labelEn: 'Office Hours', labelNe: 'कार्यालय समय', valueEn: 'Mon-Fri: 10:00 AM - 5:00 PM', valueNe: 'आइत-शुक्र: बिहान १० - बेलुका ५', action: '' },
 ];
+
+const LINK_ICON_MAP = {
+  phone: Phone,
+  mail: Mail,
+  map: MapPin,
+  clock: Clock,
+  help: HelpCircle,
+  message: MessageSquare,
+};
+
+const FALLBACK_SUPPORT = {
+  titleEn: 'Need Personalized Support?',
+  titleNe: 'व्यक्तिगत सहयोग चाहिन्छ?',
+  textEn: 'Our team is here to help you with any specific questions or concerns.',
+  textNe: 'कुनै विशेष प्रश्न वा चिन्तामा सहयोग गर्न हाम्रो टोली यहाँ छ।',
+  buttonEn: 'Contact Us',
+  buttonNe: 'सम्पर्क गर्नुहोस्',
+  action: '/contact',
+};
+
+const iconForCategory = (name) => {
+  const n = (name || '').toLowerCase();
+  if (n.includes('member')) return Users;
+  if (n.includes('service') || n.includes('program')) return Shield;
+  if (n.includes('support') || n.includes('assist') || n.includes('help')) return Heart;
+  if (n.includes('award') || n.includes('recognition')) return Award;
+  if (n.includes('train')) return BookOpen;
+  if (n.includes('general')) return HelpCircle;
+  return HelpCircle;
+};
 
 export function FAQs() {
   const { t } = useTranslation();
+  const { isNepali } = useLanguage();
+  const [faqCategories, setFaqCategories] = useState(null);
+  const [faqConfig, setFaqConfig] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [openIndex, setOpenIndex] = useState(null);
-  const [activeCategory, setActiveCategory] = useState('general');
+  const [activeCategory, setActiveCategory] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    loadFaqs();
+    loadFaqConfig();
+  }, []);
+
+  const loadFaqConfig = async () => {
+    try {
+      const { data } = await faqConfigAPI.getConfig();
+      setFaqConfig(data);
+    } catch (error) {
+      console.error('Failed to load FAQ config:', error);
+      setFaqConfig(null);
+    }
+  };
+
+  const loadFaqs = async () => {
+    try {
+      const { data } = await faqAPI.getFaqs();
+      if (Array.isArray(data) && data.length > 0) {
+        const groups = {};
+        data.forEach((faq) => {
+          const en = faq.categoryEn || faq.category || 'General';
+          const ne = faq.categoryNe || faq.category || 'General';
+          const key = en;
+          if (!groups[key]) groups[key] = { id: key, label: en, labelNe: ne, icon: iconForCategory(en), questions: [] };
+          groups[key].questions.push({
+            qEn: faq.questionEn || faq.questionNe || faq.question || '',
+            qNe: faq.questionNe || faq.questionEn || faq.question || '',
+            aEn: faq.answerEn || faq.answerNe || faq.answer || '',
+            aNe: faq.answerNe || faq.answerEn || faq.answer || '',
+          });
+        });
+        setFaqCategories(Object.values(groups));
+        setActiveCategory(Object.values(groups)[0]?.id || '');
+        setLoading(false);
+        return;
+      }
+    } catch (error) {
+      console.error('Failed to load FAQs:', error);
+    }
+    setFaqCategories(FALLBACK_FAQ_CATEGORIES);
+    setActiveCategory(FALLBACK_FAQ_CATEGORIES[0].id);
+    setLoading(false);
+  };
+
+  // Re-derived localized views whenever the language changes, without re-fetching.
+  const localizedCategories = useMemo(() => {
+    if (!faqCategories) return faqCategories;
+    return faqCategories.map((category) => ({
+      ...category,
+      label: isNepali && category.labelNe ? category.labelNe : category.label,
+      questions: (category.questions || []).map((question) => {
+        const qEn = question.qEn || question.q || '';
+        const qNe = question.qNe || question.q || '';
+        const aEn = question.aEn || question.a || '';
+        const aNe = question.aNe || question.a || '';
+        return {
+          _key: qEn + qNe + aEn + aNe,
+          q: isNepali ? (qNe || qEn || '') : (qEn || qNe || ''),
+          a: isNepali ? (aNe || aEn || '') : (aEn || aNe || ''),
+        };
+      }),
+    }));
+  }, [faqCategories, isNepali]);
+
+  const currentCategory = useMemo(
+    () => (localizedCategories || []).find(c => c.id === activeCategory),
+    [localizedCategories, activeCategory]
+  );
+  const questions = currentCategory?.questions || [];
+
+  const configLinks = useMemo(() => {
+    const links = (faqConfig && Array.isArray(faqConfig.quickLinks) ? faqConfig.quickLinks : [])
+      .map((l) => ({
+        icon: l.icon || 'help',
+        label: isNepali ? (l.labelNe || l.labelEn || '') : (l.labelEn || l.labelNe || ''),
+        value: isNepali ? (l.valueNe || l.valueEn || '') : (l.valueEn || l.valueNe || ''),
+        action: l.action || '',
+      }));
+    return links.length > 0 ? links : QUICK_LINKS.map((l) => ({
+      icon: l.icon,
+      label: isNepali ? l.labelNe : l.labelEn,
+      value: isNepali ? l.valueNe : l.valueEn,
+      action: l.action,
+    }));
+  }, [faqConfig, isNepali]);
+
+  const support = useMemo(() => {
+    if (!faqConfig) return FALLBACK_SUPPORT;
+    return {
+      title: isNepali ? (faqConfig.supportTitleNe || FALLBACK_SUPPORT.titleNe) : (faqConfig.supportTitleEn || FALLBACK_SUPPORT.titleEn),
+      text: isNepali ? (faqConfig.supportTextNe || FALLBACK_SUPPORT.textNe) : (faqConfig.supportTextEn || FALLBACK_SUPPORT.textEn),
+      button: isNepali ? (faqConfig.supportButtonNe || FALLBACK_SUPPORT.buttonNe) : (faqConfig.supportButtonEn || FALLBACK_SUPPORT.buttonEn),
+      action: faqConfig.supportButtonAction || FALLBACK_SUPPORT.action,
+    };
+  }, [faqConfig, isNepali]);
+
+  const filteredQuestions = searchQuery
+    ? questions.filter(q =>
+        q.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        q.a.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : questions;
 
   const toggleQuestion = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
-  const getIcon = (categoryId) => {
-    const category = faqCategories.find(c => c.id === categoryId);
-    return category ? category.icon : HelpCircle;
-  };
-
-  const currentCategory = faqCategories.find(c => c.id === activeCategory);
-  const questions = currentCategory?.questions || [];
-
-  const filteredQuestions = searchQuery 
-    ? questions.filter(q => 
-        q.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        q.a.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : questions;
+  if (loading) {
+    return (
+      <section className="py-20 bg-gray-50 flex items-center justify-center min-h-screen">
+        <Loader label="Loading FAQs" />
+      </section>
+    );
+  }
 
   return (
     <section className="py-20 bg-gray-50">
       <Container>
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-          
             <h1 className="font-display text-3xl md:text-4xl font-bold text-army mt-4">
               {t('sections.faqTitle')}
             </h1>
@@ -156,7 +247,7 @@ export function FAQs() {
 
           {/* Category Navigation */}
           <div className="flex flex-wrap gap-2 justify-center mb-8">
-            {faqCategories.map((category) => {
+            {(localizedCategories || []).map((category) => {
               const Icon = category.icon;
               return (
                 <button
@@ -185,7 +276,7 @@ export function FAQs() {
                 {filteredQuestions.map((faq, index) => {
                   const isOpen = openIndex === index;
                   return (
-                    <div key={index} className="transition-all">
+                    <div key={faq._key || index} className="transition-all">
                       <button
                         className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
                         onClick={() => toggleQuestion(index)}
@@ -193,13 +284,13 @@ export function FAQs() {
                         <span className={`font-medium ${isOpen ? 'text-gold' : 'text-army'}`}>
                           {faq.q}
                         </span>
-                        <ChevronDown 
+                        <ChevronDown
                           className={`h-5 w-5 text-gold transition-transform duration-300 ${
                             isOpen ? 'rotate-180' : ''
-                          }`} 
+                          }`}
                         />
                       </button>
-                      <div 
+                      <div
                         className={`px-6 overflow-hidden transition-all duration-300 ${
                           isOpen ? 'pb-4' : 'max-h-0'
                         }`}
@@ -221,11 +312,13 @@ export function FAQs() {
           {/* Quick Help Links */}
           <div className="mt-12">
             <h2 className="font-display text-2xl font-bold text-army text-center mb-6">
-              {t('sections.stillHaveQuestions')}
+              {faqConfig && (isNepali ? faqConfig.titleNe : faqConfig.titleEn)
+                ? (isNepali ? faqConfig.titleNe : faqConfig.titleEn)
+                : t('sections.stillHaveQuestions')}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {quickLinks.map((link, index) => {
-                const Icon = link.icon;
+              {configLinks.map((link, index) => {
+                const Icon = LINK_ICON_MAP[link.icon] || HelpCircle;
                 return (
                   <div
                     key={index}
@@ -234,7 +327,7 @@ export function FAQs() {
                     <div className="bg-gold/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
                       <Icon className="h-6 w-6 text-gold" />
                     </div>
-                    <h4 className="font-medium text-army text-sm">{t(link.labelKey)}</h4>
+                    <h4 className="font-medium text-army text-sm">{link.label}</h4>
                     {link.action ? (
                       <a
                         href={link.action}
@@ -254,15 +347,15 @@ export function FAQs() {
 
           {/* Contact Support */}
           <div className="mt-8 bg-gold/5 p-6 rounded-2xl border border-gold/20 text-center">
-            <h3 className="font-display text-xl font-bold text-army">{t('sections.needPersonalizedSupport')}</h3>
+            <h3 className="font-display text-xl font-bold text-army">{support.title}</h3>
             <p className="text-gray-600 mt-2">
-              Our team is here to help you with any specific questions or concerns.
+              {support.text}
             </p>
             <a
-              href="/contact"
+              href={support.action}
               className="inline-block mt-4 bg-gold text-white px-6 py-2 rounded-lg hover:bg-gold-dark transition-colors"
             >
-              {t('sections.contactUsNow')}
+              {support.button}
             </a>
           </div>
         </div>

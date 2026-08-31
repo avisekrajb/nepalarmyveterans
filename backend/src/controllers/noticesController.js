@@ -1,5 +1,6 @@
 const Notices = require('../models/Notices');
 const cloudinary = require('../config/cloudinary');
+const { logActivity } = require('../middleware/logger');
 
 const getNotices = async (req, res) => {
   try {
@@ -67,7 +68,7 @@ const createNotice = async (req, res) => {
       publicId: publicId,
       showInModal: showInModal === 'true' || showInModal === true,
     });
-
+    await logActivity({ req, action: 'CREATE', module: 'NOTICES', details: { title: notice.title } });
     res.status(201).json(notice);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -110,6 +111,7 @@ const updateNotice = async (req, res) => {
     }
 
     await notice.save();
+    await logActivity({ req, action: 'UPDATE', module: 'NOTICES', details: { title: notice.title } });
     res.json(notice);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -133,6 +135,7 @@ const deleteNotice = async (req, res) => {
     }
 
     await notice.deleteOne();
+    await logActivity({ req, action: 'DELETE', module: 'NOTICES', details: { title: notice.title } });
     res.json({ message: 'Notice deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -155,6 +158,7 @@ const toggleModalStatus = async (req, res) => {
 
     notice.showInModal = showInModal;
     await notice.save();
+    await logActivity({ req, action: 'STATUS', module: 'NOTICES', details: { id: notice._id, showInModal } });
     res.json(notice);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -176,6 +180,7 @@ const bulkDeleteNotices = async (req, res) => {
     }
 
     await Notices.deleteMany({ _id: { $in: ids } });
+    await logActivity({ req, action: 'DELETE', module: 'NOTICES', details: { count: ids.length, ids } });
     res.json({ message: `${ids.length} notices deleted successfully` });
   } catch (error) {
     res.status(500).json({ message: error.message });

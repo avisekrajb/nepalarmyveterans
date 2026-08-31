@@ -1,5 +1,6 @@
 const Leadership = require('../models/Leadership');
 const cloudinary = require('../config/cloudinary');
+const { logActivity } = require('../middleware/logger');
 
 const getLeadership = async (req, res) => {
   try {
@@ -26,6 +27,7 @@ const createLeader = async (req, res) => {
       image: req.file ? req.file.path : '',
       publicId: req.file ? req.file.filename : '',
     });
+    await logActivity({ req, action: 'CREATE', module: 'LEADERSHIP', details: { name: leader.name } });
     res.status(201).json(leader);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -59,6 +61,7 @@ const updateLeader = async (req, res) => {
     }
 
     await leader.save();
+    await logActivity({ req, action: 'UPDATE', module: 'LEADERSHIP', details: { name: leader.name } });
     res.json(leader);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -76,6 +79,7 @@ const deleteLeader = async (req, res) => {
     }
 
     await leader.deleteOne();
+    await logActivity({ req, action: 'DELETE', module: 'LEADERSHIP', details: { name: leader.name } });
     res.json({ message: 'Leader deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });

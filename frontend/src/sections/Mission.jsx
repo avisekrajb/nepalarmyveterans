@@ -14,7 +14,7 @@ export function Mission() {
               {t('sections.ourObjectives')}
             </h1>
             <p className="text-gray-600 mt-4 text-lg">
-              {t('sections.missionText')}
+              {t('')}
             </p>
           </div>
 
